@@ -77,65 +77,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ],
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TabBar(
-                  controller: _tabController,
-                  labelColor: Colors.black,
-                  indicatorColor: Colors.black,
-                  unselectedLabelColor: Colors.grey.shade500,
-                  padding: EdgeInsets.zero,
-                  tabs: <Widget>[
-                    Tab(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width / 3,
-                        child: const Text(text_day, textAlign: TextAlign.center, style: TextStyle(
-                          fontSize: 25,
-                            fontWeight: FontWeight.normal,
-                          fontFamily: "ABeeZee"
-                        ),),
-                      ),
-                    ),
-                    Tab(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width / 3,
-                        child: const Text(text_week, textAlign: TextAlign.center, style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.normal,
-                            fontFamily: "ABeeZee"
-                        ),),
-                      ),
-                    ),
-                    Tab(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width / 3,
-                        child: const Text(text_month, textAlign: TextAlign.center, style: TextStyle(
-                            fontSize: 25,
-                          fontWeight: FontWeight.normal,
-                            fontFamily: "ABeeZee"
-                        ),),
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  height: 15,
-                  decoration: BoxDecoration(color: Colors.grey.shade200),
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height -
-                      350, // Check lại, trừ đi height của đoạn phía trên tab bar để responsive
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: <Widget>[
-                      DashboardPanel(type: text_day),
-                      DashboardPanel(type: text_week),
-                      DashboardPanel(type: text_month),
-                    ],
-                  ),
-                )
+
               ],
             ),
           ),
@@ -208,6 +150,65 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                       ),
                     ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              TabBar(
+                controller: _tabController,
+                labelColor: Colors.black,
+                indicatorColor: Colors.black,
+                unselectedLabelColor: Colors.grey.shade500,
+                padding: EdgeInsets.zero,
+                tabs: <Widget>[
+                  Tab(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width / 3,
+                      child: const Text(text_day, textAlign: TextAlign.center, style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.normal,
+                          fontFamily: "ABeeZee"
+                      ),),
+                    ),
+                  ),
+                  Tab(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width / 3,
+                      child: const Text(text_week, textAlign: TextAlign.center, style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.normal,
+                          fontFamily: "ABeeZee"
+                      ),),
+                    ),
+                  ),
+                  Tab(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width / 3,
+                      child: const Text(text_month, textAlign: TextAlign.center, style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.normal,
+                          fontFamily: "ABeeZee"
+                      ),),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                height: 15,
+                decoration: BoxDecoration(color: Colors.grey.shade200),
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height -
+                    350, // Check lại, trừ đi height của đoạn phía trên tab bar để responsive
+                child: TabBarView(
+                  controller: _tabController,
+                  children: <Widget>[
+                    DashboardPanel(type: text_day),
+                    DashboardPanel(type: text_week),
+                    DashboardPanel(type: text_month),
                   ],
                 ),
               )
