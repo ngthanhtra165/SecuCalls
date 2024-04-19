@@ -167,7 +167,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width / 3,
                       child: const Text(text_day, textAlign: TextAlign.center, style: TextStyle(
-                          fontSize: 25,
+                          fontSize: 20,
                           fontWeight: FontWeight.normal,
                           fontFamily: "ABeeZee"
                       ),),
@@ -177,7 +177,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width / 3,
                       child: const Text(text_week, textAlign: TextAlign.center, style: TextStyle(
-                          fontSize: 25,
+                          fontSize: 20,
                           fontWeight: FontWeight.normal,
                           fontFamily: "ABeeZee"
                       ),),
@@ -187,7 +187,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width / 3,
                       child: const Text(text_month, textAlign: TextAlign.center, style: TextStyle(
-                          fontSize: 25,
+                          fontSize: 20,
                           fontWeight: FontWeight.normal,
                           fontFamily: "ABeeZee"
                       ),),
@@ -258,7 +258,7 @@ class DashboardPanel extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               RadialChart(
-                  label: "Số quảng cáo", value: _adsNumber, color: Colors.pinkAccent),
+                  label: text_soquangcao, value: _adsNumber, color: Colors.pinkAccent),
               RadialChart(label: "Tổng số", value: _totalNumber, color: Colors.green)
             ],
           )

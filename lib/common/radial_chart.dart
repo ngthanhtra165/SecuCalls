@@ -24,7 +24,7 @@ class RadialChart extends StatelessWidget {
           width: _width,
           height: 30,
           child: Text(label, style: TextStyle(
-            fontSize: 25,
+            fontSize: 20,
             color: Colors.grey.shade500
           ), textAlign: TextAlign.center),
         ),
