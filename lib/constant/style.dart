@@ -89,3 +89,11 @@ const TextStyle textWhite21Italic = TextStyle(
   color: Colors.white,
   fontStyle: FontStyle.normal,
 );
+
+const TextStyle textWhite26Italic = TextStyle(
+  fontFamily: "ABeeZee",
+  fontWeight: FontWeight.w400,
+  fontSize: 26,
+  color: Colors.white,
+  fontStyle: FontStyle.normal,
+);
