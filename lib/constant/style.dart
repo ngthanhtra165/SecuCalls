@@ -57,6 +57,14 @@ const TextStyle textBlack22Italic = TextStyle(
   fontStyle: FontStyle.italic,
 );
 
+const TextStyle textBlack28Italic = TextStyle(
+  fontFamily: "ABeeZee",
+  fontWeight: FontWeight.w400,
+  fontSize: 28,
+  color: Colors.black,
+  fontStyle: FontStyle.italic,
+);
+
 const TextStyle textBlack21 = TextStyle(
   fontFamily: "ABeeZee",
   fontWeight: FontWeight.w400,

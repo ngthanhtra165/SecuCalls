@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:secucalls/screen/dashboard/dashboard_screen.dart';
 import 'package:secucalls/screen/forget_password/forget_password_screen.dart';
 import 'package:secucalls/screen/login/login_screen.dart';
 import 'package:secucalls/screen/register/register_screen.dart';
@@ -11,6 +12,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => const RegisterScreen());
     case "/ForgetPassword":
       return PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => const ForgetPasswordScreen());
+    case "/Dashboard":
+      return PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => const DashboardScreen());
     default:
       return PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen());
   }
