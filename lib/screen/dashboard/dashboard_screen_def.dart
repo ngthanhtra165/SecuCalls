@@ -22,7 +22,10 @@ const double top_margin_sub_title = 50;
 const double left_margin_sub_title = 47;
 const double height_tab_bar = 120;
 const double top_margin_tab_bar_view = 20;
+const double height_drawer_header = 130;
+const double top_margin_drawer_item = 50;
+const double left_margin_drawer_item = 20;
 
 const Size size_display_box = Size(750 , 315);
-
+const Size size_logo = Size(90, 90);
 
