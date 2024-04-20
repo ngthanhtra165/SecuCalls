@@ -1,3 +1,5 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/appbar.dart';
@@ -25,6 +27,24 @@ class _DashboardScreenState extends State<DashboardScreen>
     _tabController = TabController(length: 3, vsync: this);
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  void tapOnForgetPasswordButton() {
+    print('move to forget password');
+    Navigator.of(context).pushNamed('/ForgetPassword');
+    _scaffoldKey.currentState?.openEndDrawer();
+  }
+
+  void tapOnLogOutButton() {
+    print('move to log out');
+    Navigator.pushNamedAndRemoveUntil(context, '/Login', (route) => false);
+  }
+
+  void tapOnHomeButton() {
+    print('home');
+    _scaffoldKey.currentState?.openEndDrawer();
+  }
+
   late String number;
   late final TabController _tabController;
 
@@ -34,52 +54,11 @@ class _DashboardScreenState extends State<DashboardScreen>
       designSize: fullScreenPortraitSize,
       child: SafeArea(
         child: Scaffold(
-          drawer: Drawer(
-            backgroundColor: Colors.blueAccent.shade100,
-            child: ListView(
-              children: [
-                SizedBox(
-                  height: height_drawer_header.h,
-                  width: double.infinity,
-                  child: DrawerHeader(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          alignment : Alignment.bottomCenter,
-                          "lib/assets/logo.png",
-                          width: size_logo.width.w,
-                          height: size_logo.height.h,
-                        ),
-                        const FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            title_appbar,
-                            style: textWhite26Italic,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: top_margin_drawer_item.h,),
-                Padding(
-                  padding: EdgeInsets.only(left: left_margin_drawer_item.w,),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      ListTile(
-                        leading: Icon(Icons.abc),
-                        title: Text("Trang Chu"),
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                ),
-
-              ],
-            ),
+          key: _scaffoldKey,
+          drawer: CustomDrawer(
+            tapOnForgetPasswordButton: tapOnForgetPasswordButton,
+            tapOnHomeButton: tapOnHomeButton,
+            tapOnLogOutButton: tapOnLogOutButton,
           ),
           // You can design your splash screen UI here
           resizeToAvoidBottomInset: false,
@@ -94,124 +73,16 @@ class _DashboardScreenState extends State<DashboardScreen>
           body: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              CustomTotalFigure(number: number),
               SizedBox(
-                height: size_display_box.height.h,
-                width: double.infinity,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: top_margin_total_number.h,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: left_margin_total_number.w,
-                        right: left_margin_total_number.w,
-                      ),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          number,
-                          style: textBlack28Italic,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: top_margin_title.h,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: left_margin_title.w,
-                        right: left_margin_title.w,
-                      ),
-                      child: const FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          text_title,
-                          style: textBlack21Italic,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: top_margin_sub_title.h,
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          left: left_margin_sub_title.w,
-                          right: left_margin_sub_title.w,
-                        ),
-                        child: const FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            sub_text_title,
-                            style: textBlack21Italic,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                height: 10.h,
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              TabBar(
-                controller: _tabController,
-                labelColor: Colors.black,
-                indicatorColor: Colors.black,
-                unselectedLabelColor: Colors.grey.shade500,
-                padding: EdgeInsets.zero,
-                tabs: <Widget>[
-                  Tab(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width / 3,
-                      child: const Text(text_day, textAlign: TextAlign.center, style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: "ABeeZee"
-                      ),),
-                    ),
-                  ),
-                  Tab(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width / 3,
-                      child: const Text(text_week, textAlign: TextAlign.center, style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: "ABeeZee"
-                      ),),
-                    ),
-                  ),
-                  Tab(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width / 3,
-                      child: const Text(text_month, textAlign: TextAlign.center, style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: "ABeeZee"
-                      ),),
-                    ),
-                  ),
-                ],
-              ),
+              CustomTabBar(tabController: _tabController),
               Container(
-                height: 15,
+                height: 15.h,
                 decoration: BoxDecoration(color: Colors.grey.shade200),
               ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height -
-                    350, // Check lại, trừ đi height của đoạn phía trên tab bar để responsive
-                child: TabBarView(
-                  controller: _tabController,
-                  children: <Widget>[
-                    DashboardPanel(type: text_day),
-                    DashboardPanel(type: text_week),
-                    DashboardPanel(type: text_month),
-                  ],
-                ),
-              )
+              CustomTabBarView(tabController: _tabController)
             ],
           ),
         ),
@@ -226,41 +97,311 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 }
 
-class DashboardPanel extends StatelessWidget {
-  final String type;
-
-  DashboardPanel({required this.type});
+class CustomDrawer extends StatelessWidget {
+  const CustomDrawer({
+    super.key,
+    required this.tapOnForgetPasswordButton,
+    required this.tapOnHomeButton,
+    required this.tapOnLogOutButton,
+  });
+  final VoidCallback tapOnForgetPasswordButton;
+  final VoidCallback tapOnHomeButton;
+  final VoidCallback tapOnLogOutButton;
 
   @override
   Widget build(BuildContext context) {
-    // mock call api, sau thay bằng giá trị trả về từ api
-    final double _trashNumber = type == text_day ? 75.0 : type == text_week ? 64.0 : 32.0;
-    final double _cheatNumber = type == text_day ? 25.0 : type == text_week ? 30.0 : 17.0;
-    final double _adsNumber = type == text_day ? 50.0 : type == text_week ? 37.0 : 22.0;
-    final double _totalNumber = type == text_day ? 75.0 : type == text_week ? 80.0 : 66.0;
+    return Drawer(
+      backgroundColor: Colors.lightBlue.shade200,
+      child: ListView(
+        children: [
+          SizedBox(
+            height: height_drawer_header.h,
+            width: double.infinity,
+            child: DrawerHeader(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    alignment: Alignment.bottomCenter,
+                    "lib/assets/logo.png",
+                    width: size_logo.width.w,
+                    height: size_logo.height.h,
+                  ),
+                  const FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      title_appbar,
+                      style: textWhite28Italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(
+            height: top_margin_drawer_item.h,
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+              left: left_margin_drawer_item.w,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                CustomListTile(
+                  title: title_drawer_item_1,
+                  icon: Icons.home,
+                  onPress: tapOnHomeButton,
+                ),
+                CustomListTile(
+                  title: title_drawer_item_2,
+                  icon: Icons.account_box,
+                  onPress: tapOnForgetPasswordButton,
+                ),
+                CustomListTile(
+                  title: title_drawer_item_3,
+                  icon: Icons.logout_outlined,
+                  onPress: tapOnLogOutButton,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CustomListTile extends StatelessWidget {
+  const CustomListTile({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.onPress,
+  });
+  final String title;
+  final IconData icon;
+  final VoidCallback onPress;
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        size: size_icon.height.h,
+        color: Colors.grey,
+      ),
+      title: Text(
+        title,
+        style: textWhite19,
+      ),
+      onTap: onPress,
+    );
+  }
+}
+
+class CustomTabBarView extends StatelessWidget {
+  const CustomTabBarView({
+    super.key,
+    required TabController tabController,
+  }) : _tabController = tabController;
+
+  final TabController _tabController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: SizedBox(
+        width: double.infinity,
+        child: TabBarView(
+          controller: _tabController,
+          children: const <Widget>[
+            DashboardPanel(percentageList: [20.0, 75.0, 80.0, 100.0]),
+            DashboardPanel(percentageList: [30.0, 65.0, 50.0, 75.0]),
+            DashboardPanel(percentageList: [60.0, 35.0, 20.0, 15.0]),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CustomTotalFigure extends StatelessWidget {
+  const CustomTotalFigure({
+    super.key,
+    required this.number,
+  });
+
+  final String number;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: size_display_box.height.h,
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: top_margin_total_number.h,
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+              left: left_margin_total_number.w,
+              right: left_margin_total_number.w,
+            ),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                number,
+                style: textBlack28Italic,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: top_margin_title.h,
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+              left: left_margin_title.w,
+              right: left_margin_title.w,
+            ),
+            child: const FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                text_title,
+                style: textBlack21Italic,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: top_margin_sub_title.h,
+          ),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: left_margin_sub_title.w,
+                right: left_margin_sub_title.w,
+              ),
+              child: const FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  sub_text_title,
+                  style: textBlack21Italic,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CustomTabBar extends StatelessWidget {
+  const CustomTabBar({
+    super.key,
+    required TabController tabController,
+  }) : _tabController = tabController;
+
+  final TabController _tabController;
+
+  @override
+  Widget build(BuildContext context) {
+    return TabBar(
+      controller: _tabController,
+      labelColor: Colors.black,
+      indicatorSize: TabBarIndicatorSize.tab,
+      indicatorColor: Colors.black,
+      unselectedLabelColor: Colors.grey.shade500,
+      padding: EdgeInsets.zero,
+      tabs: <Widget>[
+        Tab(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width / 3,
+            child: const Text(
+              text_day,
+              textAlign: TextAlign.center,
+              style: textBlack21Italic,
+            ),
+          ),
+        ),
+        Tab(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width / 3,
+            child: const Text(
+              text_week,
+              textAlign: TextAlign.center,
+              style: textBlack21Italic,
+            ),
+          ),
+        ),
+        Tab(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width / 3,
+            child: const Text(
+              text_month,
+              textAlign: TextAlign.center,
+              style: textBlack21Italic,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class DashboardPanel extends StatelessWidget {
+  const DashboardPanel({super.key, required this.percentageList});
+  final List<dynamic> percentageList;
+
+  @override
+  Widget build(BuildContext context) {
+    final double _trashNumber = percentageList[0];
+    final double _cheatNumber = percentageList[1];
+    final double _adsNumber = percentageList[2];
+    final double _totalNumber = percentageList[3];
+    final double height_row = height_tab_bar_view.h / 2;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.symmetric(horizontal: 20.h),
+      width: double.infinity,
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              RadialChart(
-                  label: "Số rác",
+          SizedBox(
+            height: height_row,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                RadialChart(
+                  label: text_sorac,
                   value: _trashNumber,
-                  color: Colors.deepOrange.shade300),
-              RadialChart(
-                  label: "Số lừa đảo", value: _cheatNumber, color: Colors.orangeAccent)
-            ],
+                  color: Colors.deepOrange.shade300,
+                ),
+                RadialChart(
+                  label: text_soluadao,
+                  value: _cheatNumber,
+                  color: Colors.orangeAccent,
+                ),
+              ],
+            ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              RadialChart(
-                  label: text_soquangcao, value: _adsNumber, color: Colors.pinkAccent),
-              RadialChart(label: "Tổng số", value: _totalNumber, color: Colors.green)
-            ],
+          SizedBox(
+            height: height_row,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                RadialChart(
+                  label: text_soquangcao,
+                  value: _adsNumber,
+                  color: Colors.pinkAccent,
+                ),
+                RadialChart(
+                  label: text_tongso,
+                  value: _totalNumber,
+                  color: Colors.green,
+                )
+              ],
+            ),
           )
         ],
       ),

@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:secucalls/screen/dashboard/dashboard_screen.dart';
 import 'package:secucalls/screen/forget_password/forget_password_screen.dart';
@@ -7,14 +9,32 @@ import 'package:secucalls/screen/register/register_screen.dart';
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case "/Login":
-      return PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen());
+      return _createRoute(const LoginScreen());
     case "/Register":
-      return PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => const RegisterScreen());
+      return _createRoute(const RegisterScreen());
     case "/ForgetPassword":
-      return PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => const ForgetPasswordScreen());
+      return _createRoute(const ForgetPasswordScreen());
     case "/Dashboard":
-      return PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => const DashboardScreen());
+      return _createRoute(const DashboardScreen());
     default:
-      return PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen());
+      return _createRoute(const LoginScreen());
   }
+}
+
+Route _createRoute(Widget toScreen) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => toScreen,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }
