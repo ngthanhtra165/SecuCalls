@@ -111,7 +111,7 @@ class CustomDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.lightBlue.shade200,
+      backgroundColor: Colors.white,
       child: ListView(
         children: [
           SizedBox(
@@ -132,7 +132,7 @@ class CustomDrawer extends StatelessWidget {
                     fit: BoxFit.scaleDown,
                     child: Text(
                       title_appbar,
-                      style: textWhite28Italic,
+                      style: textBlack28Italic,
                     ),
                   ),
                 ],
@@ -154,10 +154,16 @@ class CustomDrawer extends StatelessWidget {
                   icon: Icons.home,
                   onPress: tapOnHomeButton,
                 ),
+                SizedBox(
+                  height: 15.h,
+                ),
                 CustomListTile(
                   title: title_drawer_item_2,
                   icon: Icons.account_box,
                   onPress: tapOnForgetPasswordButton,
+                ),
+                SizedBox(
+                  height: 15.h,
                 ),
                 CustomListTile(
                   title: title_drawer_item_3,
@@ -189,11 +195,11 @@ class CustomListTile extends StatelessWidget {
       leading: Icon(
         icon,
         size: size_icon.height.h,
-        color: Colors.grey,
+        color: Colors.black,
       ),
       title: Text(
         title,
-        style: textWhite19,
+        style: textBlack19,
       ),
       onTap: onPress,
     );

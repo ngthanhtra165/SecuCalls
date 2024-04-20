@@ -105,6 +105,15 @@ const TextStyle textWhite19 = TextStyle(
   color: Colors.white,
   fontStyle: FontStyle.normal,
 );
+
+const TextStyle textBlack19 = TextStyle(
+  fontFamily: "ABeeZee",
+  fontWeight: FontWeight.w400,
+  fontSize: 19,
+  color: Colors.black,
+  fontStyle: FontStyle.normal,
+);
+
 const TextStyle textWhite28Italic = TextStyle(
   fontFamily: "ABeeZee",
   fontWeight: FontWeight.w400,
