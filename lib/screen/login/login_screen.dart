@@ -61,32 +61,39 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     return ScreenUtilInit(
       designSize: fullScreenPortraitSize,
       child: SafeArea(
         child: Scaffold(
           // You can design your splash screen UI here
           resizeToAvoidBottomInset: false,
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: top_margin_logo.h,
+          body: SizedBox(
+            height: screenHeight - keyboardHeight,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: top_margin_logo.h,
+                  ),
+                  const LogoAndCompanyName(),
+                  SizedBox(
+                    height: top_margin_form.h,
+                  ),
+                  CustomForm(
+                    passwordController: passwordController,
+                    phoneController: phoneController,
+                    onTapButton: tapOnLoginButton,
+                  ),
+                  RegisterAndForgetPasswordButtons(
+                    tapOnRegisterButton: tapOnRegisterButton,
+                    tapOnForgetPasswordButton: tapOnForgetPasswordButton,
+                  )
+                ],
               ),
-              const LogoAndCompanyName(),
-              SizedBox(
-                height: top_margin_form.h,
-              ),
-              CustomForm(
-                passwordController: passwordController,
-                phoneController: phoneController,
-                onTapButton: tapOnLoginButton,
-              ),
-              RegisterAndForgetPasswordButtons(
-                tapOnRegisterButton: tapOnRegisterButton,
-                tapOnForgetPasswordButton: tapOnForgetPasswordButton,
-              )
-            ],
+            ),
           ),
         ),
       ),

@@ -76,11 +76,11 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
                         ),
                       ),
                       title: const Text(
-                        "X-SLAYER",
+                        "Thanh Tra",
                         style: TextStyle(
                             fontSize: 20.0, fontWeight: FontWeight.bold),
                       ),
-                      subtitle: const Text("Sousse , Tunisia"),
+                      subtitle: const Text("Ha Tinh , Viet Nam"),
                     ),
                     const Spacer(),
                     const Divider(color: Colors.black54),
@@ -97,7 +97,7 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
                             ],
                           ),
                           Text(
-                            "Flutter Overlay",
+                            "SecuCalls",
                             style: TextStyle(
                                 fontSize: 15.0, fontWeight: FontWeight.bold),
                           ),
