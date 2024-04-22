@@ -64,10 +64,13 @@ class CustomTextButton extends StatelessWidget {
           ),
         ),
       ),
-      child: Text(
-        text,
-        textAlign: textAlign,
-        style: textGray19Italic, // Set text color
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
+          textAlign: textAlign,
+          style: textGray19Italic, // Set text color
+        ),
       ),
     );
   }

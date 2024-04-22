@@ -30,20 +30,20 @@ class _LoginScreenState extends State<LoginScreen> {
     var email = passwordController.text;
     // Do something with the entered data
     print('Name: $name, Email: $email');
-    // Navigator.of(context).pushNamed('/Dashboard');
+    Navigator.of(context).pushNamed('/Dashboard');
     FlutterOverlayWindow.closeOverlay()
         .then((value) => print('STOPPED: alue: $value'));
   }
 
   void tapOnRegisterButton() async {
     print('move to register');
-    //Navigator.of(context).pushNamed('/Register');
+    Navigator.of(context).pushNamed('/Register');
     await FlutterOverlayWindow.requestPermission();
   }
 
   void tapOnForgetPasswordButton() async {
     print('move to register');
-    //Navigator.of(context).pushNamed('/ForgetPassword');
+    Navigator.of(context).pushNamed('/ForgetPassword');
     if (await FlutterOverlayWindow.isActive()) return;
     print("show popup");
     await FlutterOverlayWindow.showOverlay(

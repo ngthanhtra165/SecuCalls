@@ -5,7 +5,7 @@ const double top_margin_form = 50;
 const double left_margin_form = 55;
 const double space_between_text_fields = 30;
 const double top_margin_forget_password_button = 190;
-const double left_margin_forget_password_button = 210;
+const double left_margin_forget_password_button = 190;
 
 const String title_appbar = "Đăng ký tài khoản";
 const String hint_text_last_name = "Họ";

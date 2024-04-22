@@ -15,4 +15,4 @@ const double left_margin_form = 55;
 const double space_between_form_button = 30;
 
 const double top_margin_register_button = 104;
-const double left_margin_register_button = 290;
+const double left_margin_register_button = 270;
