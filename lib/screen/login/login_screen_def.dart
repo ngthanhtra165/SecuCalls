@@ -3,9 +3,9 @@
 
 const double top_margin_logo = 35;
 const double left_margin_logo = 124;
-const double top_margin_form = 130;
+const double top_margin_form = 100;
 const double left_margin_form = 35;
-const double space_between_text_field = 30;
+const double space_between_text_field = 15;
 
 const double top_margin_two_buttons = 20;
 

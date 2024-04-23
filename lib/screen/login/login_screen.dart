@@ -24,6 +24,12 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
   }
 
+  void dispose() {
+    // Close the keyboard when the widget is disposed
+    FocusScope.of(context).unfocus();
+    super.dispose();
+  }
+
   void tapOnLoginButton() async {
     var name = phoneController.text;
     var email = passwordController.text;
@@ -32,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
     print('Name: $name, Email: $email');
     Navigator.of(context).pushNamed('/Dashboard');
   }
-  
+
   void tapOnRegisterButton() async {
     print('move to register');
     Navigator.of(context).pushNamed('/Register');
@@ -67,8 +73,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: top_margin_form.h,
                   ),
                   CustomForm(
-                    passwordController: passwordController,
-                    phoneController: phoneController,
                     onTapButton: tapOnLoginButton,
                   ),
                   RegisterAndForgetPasswordButtons(
@@ -167,14 +171,8 @@ class LogoAndCompanyName extends StatelessWidget {
 
 // Custom form widget containing multiple CustomTextField widgets
 class CustomForm extends StatelessWidget {
-  const CustomForm(
-      {super.key,
-      required this.phoneController,
-      required this.passwordController,
-      required this.onTapButton});
+  const CustomForm({super.key, required this.onTapButton});
 
-  final TextEditingController phoneController;
-  final TextEditingController passwordController;
   final VoidCallback onTapButton;
   @override
   Widget build(BuildContext context) {
@@ -188,15 +186,19 @@ class CustomForm extends StatelessWidget {
           CustomTextField(
             icon: Icons.phone,
             hintText: text_phone,
-            controller: phoneController,
+            validator: (text) {
+              return null;
+            },
           ),
           SizedBox(
             height: space_between_text_field.h,
           ),
           CustomTextField(
             icon: Icons.lock_outline,
-            hintText: text_phone,
-            controller: passwordController,
+            hintText: text_password,
+            validator: (Text) {
+              return null;
+            },
           ),
           SizedBox(
             height: space_between_text_field.h,

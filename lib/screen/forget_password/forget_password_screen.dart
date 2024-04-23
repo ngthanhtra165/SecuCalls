@@ -6,6 +6,7 @@ import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/forget_password/forget_password_def.dart';
+import 'package:secucalls/utils/validate.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({super.key});
@@ -16,12 +17,15 @@ class ForgetPasswordScreen extends StatefulWidget {
 }
 
 class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
   }
 
   void tapOnBackButton() {
+    FocusScope.of(context).unfocus();
     Navigator.of(context).pop();
   }
 
@@ -32,7 +36,15 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
   void tapOnForgetPasswordButton() {
     print('move to forget password');
-    //Navigator.of(context).pushNamed('/ForgetPassword');
+    FocusScope.of(context).unfocus();
+        final isValid = _formKey.currentState?.validate();
+    if (isValid == true) {
+      _formKey.currentState?.save();
+      ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Processing Data')));
+      // wait server response
+      return;
+    }
   }
 
   final TextEditingController phoneController = TextEditingController();
@@ -61,8 +73,8 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                 height: top_margin_form.h,
               ),
               CustomForm(
-                phoneController: phoneController,
                 onPressed: tapOnForgetPasswordButton,
+                formKey: _formKey,
               ),
               SizedBox(
                 height: top_margin_register_button.h,
@@ -89,36 +101,36 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 class CustomForm extends StatelessWidget {
   const CustomForm({
     super.key,
-    required this.phoneController,
-    required this.onPressed,
+    required this.onPressed, required this.formKey,
   });
 
-  final TextEditingController phoneController;
   final VoidCallback onPressed;
-
+  final GlobalKey<FormState> formKey;
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: left_margin_form.w,
-        right: left_margin_form.w,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          CustomTextField(
-            icon: Icons.phone,
-            hintText: hint_text_phone,
-            controller: phoneController,
-          ),
-          SizedBox(
-            height: space_between_form_button.h,
-          ),
-          CustomButton(
-            text: text_button,
-            onPressed: onPressed,
-          ),
-        ],
+    return Form(
+      key: formKey,
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: left_margin_form.w,
+          right: left_margin_form.w,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CustomTextField(
+              icon: Icons.phone,
+              hintText: hint_text_phone, validator: (text) => validatePhoneNumber(text),
+            ),
+            SizedBox(
+              height: space_between_form_button.h,
+            ),
+            CustomButton(
+              text: text_button,
+              onPressed: onPressed,
+            ),
+          ],
+        ),
       ),
     );
   }

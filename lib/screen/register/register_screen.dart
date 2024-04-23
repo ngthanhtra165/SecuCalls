@@ -5,6 +5,7 @@ import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/screen/register/register_screen_def.dart';
+import 'package:secucalls/utils/validate.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,30 +16,35 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
   }
 
   void tapOnBackButton() {
+    FocusScope.of(context).unfocus();
     Navigator.of(context).pop();
   }
 
   void tapOnRegisterButton() {
     print('move to register');
     //Navigator.of(context).pushNamed('/Register');
-    
+    final isValid = _formKey.currentState?.validate();
+    if (isValid == true) {
+      _formKey.currentState?.save();
+      ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Processing Data')));
+      // wait server response
+      return;
+    }
   }
 
   void tapOnForgetPasswordButton() {
     print('move to forget password');
     Navigator.of(context).pushNamed('/ForgetPassword');
   }
-
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -62,11 +68,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   CustomForm(
-                    lastNameController: lastNameController,
-                    firstNameController: firstNameController,
-                    phoneController: phoneController,
-                    passwordController: passwordController,
                     onPressed: tapOnRegisterButton,
+                    form: _formKey,
                   ),
                   SizedBox(
                     height: top_margin_forget_password_button.h,
@@ -94,67 +97,61 @@ class _RegisterScreenState extends State<RegisterScreen> {
 class CustomForm extends StatelessWidget {
   const CustomForm({
     super.key,
-    required this.lastNameController,
-    required this.firstNameController,
-    required this.phoneController,
-    required this.passwordController,
     required this.onPressed,
+    required this.form,
   });
-
-  final TextEditingController lastNameController;
-  final TextEditingController firstNameController;
-  final TextEditingController phoneController;
-  final TextEditingController passwordController;
+  final GlobalKey<FormState> form;
   final VoidCallback onPressed;
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding:
           EdgeInsets.only(left: left_margin_form.w, right: left_margin_form.w),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: top_margin_form.h,
-          ),
-          CustomTextField(
-            icon: Icons.account_box_outlined,
-            hintText: hint_text_last_name,
-            controller: lastNameController,
-          ),
-          SizedBox(
-            height: space_between_text_fields.h,
-          ),
-          CustomTextField(
-            icon: Icons.account_box_outlined,
-            hintText: hint_text_first_name,
-            controller: firstNameController,
-          ),
-          SizedBox(
-            height: space_between_text_fields.h,
-          ),
-          CustomTextField(
-            icon: Icons.phone,
-            hintText: hint_text_phone,
-            controller: phoneController,
-          ),
-          SizedBox(
-            height: space_between_text_fields.h,
-          ),
-          CustomTextField(
-            icon: Icons.lock_outline,
-            hintText: hint_text_password,
-            controller: passwordController,
-          ),
-          SizedBox(
-            height: space_between_text_fields.h,
-          ),
-          CustomButton(
-            text: text_button,
-            onPressed: onPressed,
-          ),
-        ],
+      child: Form(
+        key: form,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: top_margin_form.h,
+            ),
+            CustomTextField(
+                icon: Icons.account_box_outlined,
+                hintText: hint_text_last_name,
+                validator: (text) => validateName(text)),
+            SizedBox(
+              height: space_between_text_fields.h,
+            ),
+            CustomTextField(
+              icon: Icons.account_box_outlined,
+              hintText: hint_text_first_name,
+              validator: (text) => validateName(text),
+            ),
+            SizedBox(
+              height: space_between_text_fields.h,
+            ),
+            CustomTextField(
+              icon: Icons.phone,
+              hintText: hint_text_phone,
+              validator: (text) => validatePhoneNumber(text),
+            ),
+            SizedBox(
+              height: space_between_text_fields.h,
+            ),
+            CustomTextField(
+              icon: Icons.lock_outline,
+              hintText: hint_text_password,
+              validator: (text) => validatePassword(text),
+            ),
+            SizedBox(
+              height: space_between_text_fields.h,
+            ),
+            CustomButton(
+              text: text_button,
+              onPressed: onPressed,
+            ),
+          ],
+        ),
       ),
     );
   }

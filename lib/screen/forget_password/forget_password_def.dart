@@ -12,7 +12,7 @@ const double top_margin_title_text = 84;
 const double left_margin_title_text = 48;
 const double top_margin_form = 103;
 const double left_margin_form = 55;
-const double space_between_form_button = 30;
+const double space_between_form_button = 15;
 
 const double top_margin_register_button = 104;
 const double left_margin_register_button = 270;

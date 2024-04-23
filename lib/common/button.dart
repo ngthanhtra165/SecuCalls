@@ -16,8 +16,8 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: size_text_field_and_button.width.w,
-      height: size_text_field_and_button.height.h,
+      width: size_text_button.width.w,
+      height: size_text_button.height.h ,
       child: TextButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(
