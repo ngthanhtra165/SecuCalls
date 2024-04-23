@@ -13,11 +13,6 @@ class TrueCallerOverlay extends StatefulWidget {
 class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
   bool isGold = true;
   
-  final _goldColors = const [
-    Color(0xFFa2790d),
-    Color(0xFFebd197),
-    Color(0xFFa2790d),
-  ];
 
   final _silverColors = const [
     Color(0xFFAEB2B8),

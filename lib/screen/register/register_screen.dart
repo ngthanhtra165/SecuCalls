@@ -27,6 +27,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void tapOnRegisterButton() {
     print('move to register');
     //Navigator.of(context).pushNamed('/Register');
+    
   }
 
   void tapOnForgetPasswordButton() {
@@ -41,6 +42,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     return ScreenUtilInit(
       designSize: fullScreenPortraitSize,
       child: SafeArea(
@@ -52,30 +55,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
             title: title_appbar,
             onPressed: tapOnBackButton,
           ),
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              CustomForm(
-                lastNameController: lastNameController,
-                firstNameController: firstNameController,
-                phoneController: phoneController,
-                passwordController: passwordController,
-                onPressed: tapOnRegisterButton,
+          body: SizedBox(
+            height: screenHeight - keyboardHeight,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  CustomForm(
+                    lastNameController: lastNameController,
+                    firstNameController: firstNameController,
+                    phoneController: phoneController,
+                    passwordController: passwordController,
+                    onPressed: tapOnRegisterButton,
+                  ),
+                  SizedBox(
+                    height: top_margin_forget_password_button.h,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: left_margin_forget_password_button.w,
+                      right: left_margin_forget_password_button.w,
+                    ),
+                    child: CustomTextButton(
+                        text: text_button_forget_password,
+                        onPressed: tapOnForgetPasswordButton,
+                        textAlign: TextAlign.center),
+                  ),
+                ],
               ),
-              SizedBox(
-                height: top_margin_forget_password_button.h,
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  left: left_margin_forget_password_button.w,
-                  right: left_margin_forget_password_button.w,
-                ),
-                child: CustomTextButton(
-                    text: text_button_forget_password,
-                    onPressed: tapOnForgetPasswordButton,
-                    textAlign: TextAlign.center),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -100,6 +108,7 @@ class CustomForm extends StatelessWidget {
   final VoidCallback onPressed;
   @override
   Widget build(BuildContext context) {
+
     return Padding(
       padding:
           EdgeInsets.only(left: left_margin_form.w, right: left_margin_form.w),

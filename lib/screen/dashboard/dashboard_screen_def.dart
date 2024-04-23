@@ -34,3 +34,4 @@ const Size size_icon = Size(49, 49);
 const String title_drawer_item_1 = "Trang chủ";
 const String title_drawer_item_2 = "Quên mật khẩu";
 const String title_drawer_item_3 = "Đăng xuất";
+const String title_drawer_item_4 = "Lịch sử cuộc gọi";

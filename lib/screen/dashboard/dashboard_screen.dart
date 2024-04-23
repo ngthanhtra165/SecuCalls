@@ -2,10 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:secucalls/common/appbar.dart';
-import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/radial_chart.dart';
-import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/dashboard/dashboard_screen_def.dart';
@@ -45,6 +42,11 @@ class _DashboardScreenState extends State<DashboardScreen>
     _scaffoldKey.currentState?.openEndDrawer();
   }
 
+  void tapOnCallLogButton() {
+    print('move to call log');
+    // TODO
+  }
+
   late String number;
   late final TabController _tabController;
 
@@ -59,6 +61,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             tapOnForgetPasswordButton: tapOnForgetPasswordButton,
             tapOnHomeButton: tapOnHomeButton,
             tapOnLogOutButton: tapOnLogOutButton,
+            tapOnCallLogButton: tapOnCallLogButton,
           ),
           // You can design your splash screen UI here
           resizeToAvoidBottomInset: false,
@@ -102,12 +105,13 @@ class CustomDrawer extends StatelessWidget {
     super.key,
     required this.tapOnForgetPasswordButton,
     required this.tapOnHomeButton,
-    required this.tapOnLogOutButton,
+    required this.tapOnLogOutButton, 
+    required this.tapOnCallLogButton,
   });
   final VoidCallback tapOnForgetPasswordButton;
   final VoidCallback tapOnHomeButton;
   final VoidCallback tapOnLogOutButton;
-
+  final VoidCallback tapOnCallLogButton;
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -155,7 +159,15 @@ class CustomDrawer extends StatelessWidget {
                   onPress: tapOnHomeButton,
                 ),
                 SizedBox(
-                  height: 15.h,
+                  height: 10.h,
+                ),
+                CustomListTile(
+                  title: title_drawer_item_4,
+                  icon: Icons.phone,
+                  onPress: tapOnCallLogButton,
+                ),
+                SizedBox(
+                  height: 10.h,
                 ),
                 CustomListTile(
                   title: title_drawer_item_2,
@@ -163,7 +175,7 @@ class CustomDrawer extends StatelessWidget {
                   onPress: tapOnForgetPasswordButton,
                 ),
                 SizedBox(
-                  height: 15.h,
+                  height: 10.h,
                 ),
                 CustomListTile(
                   title: title_drawer_item_3,
@@ -367,14 +379,14 @@ class DashboardPanel extends StatelessWidget {
     final double _cheatNumber = percentageList[1];
     final double _adsNumber = percentageList[2];
     final double _totalNumber = percentageList[3];
-    final double height_row = height_tab_bar_view.h / 2;
+    final double heightRow = height_tab_bar_view.h / 2;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.h),
       width: double.infinity,
       child: Column(
         children: [
           SizedBox(
-            height: height_row,
+            height: heightRow,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -392,7 +404,7 @@ class DashboardPanel extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: height_row,
+            height: heightRow,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

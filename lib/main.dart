@@ -19,7 +19,7 @@ void overlayMain() async {
   debugPrint("Starting Alerting Window Isolate!");
   WidgetsFlutterBinding.ensureInitialized();
   
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: TrueCallerOverlay()
   ));

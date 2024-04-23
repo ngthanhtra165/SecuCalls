@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/text_field.dart';
@@ -28,35 +27,20 @@ class _LoginScreenState extends State<LoginScreen> {
   void tapOnLoginButton() async {
     var name = phoneController.text;
     var email = passwordController.text;
+
     // Do something with the entered data
     print('Name: $name, Email: $email');
     Navigator.of(context).pushNamed('/Dashboard');
-    FlutterOverlayWindow.closeOverlay()
-        .then((value) => print('STOPPED: alue: $value'));
   }
-
+  
   void tapOnRegisterButton() async {
     print('move to register');
     Navigator.of(context).pushNamed('/Register');
-    await FlutterOverlayWindow.requestPermission();
   }
 
   void tapOnForgetPasswordButton() async {
     print('move to register');
     Navigator.of(context).pushNamed('/ForgetPassword');
-    if (await FlutterOverlayWindow.isActive()) return;
-    print("show popup");
-    await FlutterOverlayWindow.showOverlay(
-      enableDrag: true,
-      overlayTitle: "Thanh Tra",
-      overlayContent: 'Overlay Enabled',
-      flag: OverlayFlag.defaultFlag,
-      visibility: NotificationVisibility.visibilityPublic,
-      positionGravity: PositionGravity.auto,
-      height: (MediaQuery.of(context).size.height * 0.6).toInt(),
-      width: WindowSize.matchParent,
-      startPosition: const OverlayPosition(0, -259),
-    );
   }
 
   @override
