@@ -8,15 +8,15 @@ import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/forget_password/forget_password_def.dart';
 import 'package:secucalls/utils/validate.dart';
 
-class ForgetPasswordScreen extends StatefulWidget {
-  const ForgetPasswordScreen({super.key});
+class NewPasswordScreen extends StatefulWidget {
+  const NewPasswordScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _ForgetPasswordScreenState createState() => _ForgetPasswordScreenState();
+  _NewPasswordScreenState createState() => _NewPasswordScreenState();
 }
 
-class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
+class _NewPasswordScreenState extends State<NewPasswordScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -34,7 +34,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     Navigator.of(context).pushNamed('/Register');
   }
 
-  void tapOnForgetPasswordButton() {
+  void tapOnNewPasswordButton() {
     print('move to forget password');
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
@@ -45,7 +45,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
       // wait server response
 
-      Navigator.of(context).pushNamed('/OTPValidation');
+      //Navigator.of(context).pushNamed('/');
       return;
     }
   }
@@ -71,14 +71,14 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
               ),
               const TextTitle(),
               SizedBox(
-                height: top_margin_form.h,
+                height: top_margin_form_new_password.h,
               ),
               CustomForm(
-                onPressed: tapOnForgetPasswordButton,
+                onPressed: tapOnNewPasswordButton,
                 formKey: _formKey,
               ),
               SizedBox(
-                height: top_margin_register_button.h,
+                height: top_margin_register_button_new_password.h,
               ),
               Padding(
                 padding: EdgeInsets.only(
@@ -100,12 +100,17 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 }
 
 class CustomForm extends StatelessWidget {
-  const CustomForm({
+  CustomForm({
     super.key,
     required this.onPressed,
     required this.formKey,
   });
 
+  void _update(String? confirmPassword) {
+    _confirmPassword = confirmPassword;
+  }
+
+  String? _confirmPassword = "";
   final VoidCallback onPressed;
   final GlobalKey<FormState> formKey;
   @override
@@ -121,9 +126,21 @@ class CustomForm extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             CustomTextField(
-              icon: Icons.alternate_email,
-              hintText: hint_text_email,
-              validator: (text) => validateEmail(text),
+              icon: null,
+              hintText: hint_text_new_password,
+              validator: (text) => validatePassword(text),
+              isPassword: true,
+              onSaved: _update,
+            ),
+            SizedBox(
+              height: space_between_form_button.h,
+            ),
+            CustomTextField(
+              hintText: text_title_new_password,
+              validator: (text) =>
+                  validateSimilarPassword(text, _confirmPassword),
+              icon: null,
+              isPassword: true,
             ),
             SizedBox(
               height: space_between_form_button.h,
@@ -154,7 +171,7 @@ class TextTitle extends StatelessWidget {
       child: const FittedBox(
         fit: BoxFit.scaleDown,
         child: Text(
-          text_title,
+          text_title_new_password,
           style: textGray21Italic,
         ),
       ),

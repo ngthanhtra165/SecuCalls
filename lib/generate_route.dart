@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:secucalls/screen/dashboard/dashboard_screen.dart';
 import 'package:secucalls/screen/forget_password/forget_password_screen.dart';
+import 'package:secucalls/screen/forget_password/new_password_screen.dart';
+import 'package:secucalls/screen/forget_password/otp_validatiton_screen.dart';
 import 'package:secucalls/screen/login/login_screen.dart';
 import 'package:secucalls/screen/register/register_screen.dart';
 
@@ -16,6 +18,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return _createRoute(const ForgetPasswordScreen());
     case "/Dashboard":
       return _createRoute(const DashboardScreen());
+    case "/OTPValidation":
+      return _createRoute(const OTPValidationScreen());
+    case "/NewPassword":
+      return _createRoute(const NewPasswordScreen());
     default:
       return _createRoute(const LoginScreen());
   }

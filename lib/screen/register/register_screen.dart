@@ -34,8 +34,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final isValid = _formKey.currentState?.validate();
     if (isValid == true) {
       _formKey.currentState?.save();
-      ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Processing Data')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Processing Data')));
       // wait server response
       return;
     }
@@ -100,8 +100,10 @@ class CustomForm extends StatelessWidget {
     required this.onPressed,
     required this.form,
   });
+
   final GlobalKey<FormState> form;
   final VoidCallback onPressed;
+  
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -116,9 +118,10 @@ class CustomForm extends StatelessWidget {
               height: top_margin_form.h,
             ),
             CustomTextField(
-                icon: Icons.account_box_outlined,
-                hintText: hint_text_last_name,
-                validator: (text) => validateName(text)),
+              icon: Icons.account_box_outlined,
+              hintText: hint_text_last_name,
+              validator: (text) => validateName(text),
+            ),
             SizedBox(
               height: space_between_text_fields.h,
             ),
@@ -132,8 +135,8 @@ class CustomForm extends StatelessWidget {
             ),
             CustomTextField(
               icon: Icons.phone,
-              hintText: hint_text_phone,
-              validator: (text) => validatePhoneNumber(text),
+              hintText: hint_text_email,
+              validator: (text) => validateEmail(text),
             ),
             SizedBox(
               height: space_between_text_fields.h,
@@ -142,6 +145,7 @@ class CustomForm extends StatelessWidget {
               icon: Icons.lock_outline,
               hintText: hint_text_password,
               validator: (text) => validatePassword(text),
+              isPassword: true,
             ),
             SizedBox(
               height: space_between_text_fields.h,

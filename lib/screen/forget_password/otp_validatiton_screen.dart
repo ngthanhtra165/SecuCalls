@@ -8,15 +8,15 @@ import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/forget_password/forget_password_def.dart';
 import 'package:secucalls/utils/validate.dart';
 
-class ForgetPasswordScreen extends StatefulWidget {
-  const ForgetPasswordScreen({super.key});
+class OTPValidationScreen extends StatefulWidget {
+  const OTPValidationScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _ForgetPasswordScreenState createState() => _ForgetPasswordScreenState();
+  _OTPValidationScreenState createState() => _OTPValidationScreenState();
 }
 
-class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
+class _OTPValidationScreenState extends State<OTPValidationScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -34,7 +34,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     Navigator.of(context).pushNamed('/Register');
   }
 
-  void tapOnForgetPasswordButton() {
+  void tapOnOTPValidationButton() {
     print('move to forget password');
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
@@ -44,8 +44,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
           .showSnackBar(const SnackBar(content: Text('Processing Data')));
 
       // wait server response
-
-      Navigator.of(context).pushNamed('/OTPValidation');
+      Navigator.of(context).pushNamed('/NewPassword');
       return;
     }
   }
@@ -71,14 +70,14 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
               ),
               const TextTitle(),
               SizedBox(
-                height: top_margin_form.h,
+                height: top_margin_form_otp.h,
               ),
               CustomForm(
-                onPressed: tapOnForgetPasswordButton,
+                onPressed: tapOnOTPValidationButton,
                 formKey: _formKey,
               ),
               SizedBox(
-                height: top_margin_register_button.h,
+                height: 80.h,
               ),
               Padding(
                 padding: EdgeInsets.only(
@@ -121,9 +120,10 @@ class CustomForm extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             CustomTextField(
-              icon: Icons.alternate_email,
-              hintText: hint_text_email,
-              validator: (text) => validateEmail(text),
+              icon: null,
+              hintText: hint_text_otp,
+              validator: (text) => validateOTP(text),
+              isOnlyDigits: true,
             ),
             SizedBox(
               height: space_between_form_button.h,
@@ -151,12 +151,11 @@ class TextTitle extends StatelessWidget {
         left: left_margin_title_text.w,
         right: left_margin_title_text.w,
       ),
-      child: const FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          text_title,
-          style: textGray21Italic,
-        ),
+      child: const Text(
+        text_title_otp_validation,
+        style: textGray21Italic,
+        maxLines: 2,
+        textAlign: TextAlign.center,
       ),
     );
   }

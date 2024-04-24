@@ -184,8 +184,8 @@ class CustomForm extends StatelessWidget {
       child: Column(
         children: [
           CustomTextField(
-            icon: Icons.phone,
-            hintText: text_phone,
+            icon: Icons.alternate_email,
+            hintText: text_mail,
             validator: (text) {
               return null;
             },
@@ -199,6 +199,7 @@ class CustomForm extends StatelessWidget {
             validator: (Text) {
               return null;
             },
+            isPassword: true,
           ),
           SizedBox(
             height: space_between_text_field.h,

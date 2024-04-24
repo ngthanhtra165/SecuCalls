@@ -53,3 +53,34 @@ String? validateName(String? name) {
     return null;
   }
 }
+
+String? validateEmail(String? email) {
+  if (email == null || email.trim() == "") {
+    return "Empty email!";
+  }
+
+  String emailPattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+  RegExp regExp = RegExp(emailPattern);
+  return regExp.hasMatch(email) ? null : "Invalid email!";
+}
+
+String? validateOTP(String? otp) {
+  if (otp == null || otp.trim() == "") {
+    return "Empty OTP!";
+  }
+
+  String otpPattern = r'^\d{6}$';
+  RegExp regExp = RegExp(otpPattern);
+  return regExp.hasMatch(otp) ? null : "Invalid OTP!";
+}
+
+String? validateSimilarPassword(String? password, String? inputtedPassword) {
+  if (password == null || password.trim() == "") {
+    return "Please re-enter your password";
+  }
+  if (password != inputtedPassword) {
+    return 'Passwords do not match';
+    print('pass: $password, newpass: $inputtedPassword');
+  }
+  return null;
+}
