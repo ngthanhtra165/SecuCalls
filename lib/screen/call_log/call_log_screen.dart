@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/drawer.dart';
+import 'package:secucalls/constant/constants.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/call_log/call_log_screen_def.dart';
@@ -19,16 +20,9 @@ class _CallLogScreenState extends State<CallLogScreen>
   // List<String> missedCalls = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final List<String> recentCalls = [
-    "John Doe",
-    "Jane Smith",
-    "Alice Johnson",
-  ];
+  List<(String, String, TypeOfCall)> recentCalls = [];
 
-  final List<String> missedCalls = [
-    "Bob Johnson",
-    "Kate Williams",
-  ];
+  List<(String, String, TypeOfCall)> missedCalls = [];
 
   late final TabController _tabController;
   @override
@@ -39,16 +33,50 @@ class _CallLogScreenState extends State<CallLogScreen>
   }
 
   void _getCallLogs() async {
-    var entries = await CallLog.get();
+    // var entries = await CallLog.get();
+    // print("recentCalls $entries");
     // setState(() {
     //   recentCalls = entries
     //       .where((entry) =>
     //           entry.callType == CallType.outgoing ||
-    //           entry.callType == CallType.incoming).cast<String>()
-    //       .toList();
-    //   missedCalls =
-    //       entries.where((entry) => entry.callType == CallType.missed).cast<String>().toList();
-    // });
+    //           entry.callType == CallType.incoming).cast<String>().toList();
+    //   missedCalls = entries.where((entry) => entry.callType == CallType.missed).cast<String>().toList();
+    // })
+    // ;
+    final Iterable<CallLogEntry> cLog = await CallLog.get();
+    print('Queried call log entries');
+    for (CallLogEntry entry in cLog) {
+      late final TypeOfCall typeOfCall;
+      switch (entry.callType) {
+        case CallType.incoming:
+          typeOfCall = TypeOfCall.incoming;
+        case CallType.missed:
+          typeOfCall = TypeOfCall.missed;
+          setState(() {
+            missedCalls.add((
+              entry.cachedMatchedNumber,
+              checkInfo(entry.cachedMatchedNumber),
+              typeOfCall
+            ) as (String, String, TypeOfCall));
+          });
+
+        case CallType.outgoing:
+          typeOfCall = TypeOfCall.outgoing;
+        default:
+          typeOfCall = TypeOfCall.outgoing;
+      }
+      setState(() {
+        recentCalls.add((
+          entry.cachedMatchedNumber,
+          checkInfo(entry.cachedMatchedNumber),
+          typeOfCall
+        ) as (String, String, TypeOfCall));
+      });
+    }
+  }
+
+  String checkInfo(String? number) {
+    return "Spam : Sale bat dong san";
   }
 
   void tapOnForgetPasswordButton() {
@@ -89,7 +117,7 @@ class _CallLogScreenState extends State<CallLogScreen>
             tapOnCallLogButton: tapOnCallLogButton,
           ),
           appBar: AppBar(
-            toolbarHeight: 100.h,
+            toolbarHeight: 110.h,
             title: Container(
               height: 70.h,
               margin: EdgeInsets.only(
@@ -130,12 +158,10 @@ class _CallLogScreenState extends State<CallLogScreen>
               // Recent Calls Tab
               CustomListView(
                 listInfo: recentCalls,
-                iconData: Icons.call_received,
               ),
               // Missed Calls Tab
               CustomListView(
                 listInfo: missedCalls,
-                iconData: Icons.call_missed,
               ),
             ],
           ),
@@ -149,17 +175,21 @@ class CustomListView extends StatelessWidget {
   const CustomListView({
     super.key,
     required this.listInfo,
-    required this.iconData,
   });
-  Widget checkInfo(String number) {
-    return Text(
-      "huhu",
-      style: textGray15Italic,
-    );
+
+  final List<(String, String, TypeOfCall)> listInfo;
+
+  IconData iconDataForCallType(TypeOfCall type) {
+    switch (type) {
+      case TypeOfCall.missed:
+        return Icons.call_missed;
+      case TypeOfCall.incoming:
+        return Icons.call_received;
+      case TypeOfCall.outgoing:
+        return Icons.call_made;
+    }
   }
 
-  final List<String> listInfo;
-  final IconData iconData;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -184,11 +214,14 @@ class CustomListView extends StatelessWidget {
                 ),
                 child: ListTile(
                   title: Text(
-                    listInfo[index],
+                    listInfo[index].$1,
                     style: textBlack18,
                   ),
-                  leading: Icon(iconData),
-                  subtitle: checkInfo(listInfo[index]),
+                  leading: Icon(iconDataForCallType(listInfo[index].$3)),
+                  subtitle: Text(
+                    listInfo[index].$2,
+                    style: textGray15Italic,
+                  ),
                   onTap: () {
                     // Handle tap on recent call
                   },

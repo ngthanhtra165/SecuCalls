@@ -11,6 +11,7 @@ class CustomTextField extends StatefulWidget {
   final Function(String?)? onSaved;
   final bool? isPassword;
   final bool? isOnlyDigits;
+  final TextEditingController? controller;
 
   const CustomTextField({
     super.key,
@@ -20,6 +21,7 @@ class CustomTextField extends StatefulWidget {
     this.isPassword,
     this.onSaved,
     this.isOnlyDigits,
+    this.controller,
   });
 
   @override
@@ -35,6 +37,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       width: size_text_field_and_button.width.w,
       height: size_text_field_and_button.height.h,
       child: TextFormField(
+        controller: widget.controller,
         keyboardType:
             (widget.isOnlyDigits != null) ? TextInputType.number : null,
         obscureText: (widget.isPassword != null) ? passwordVisible : false,

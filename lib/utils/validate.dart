@@ -75,12 +75,12 @@ String? validateOTP(String? otp) {
 }
 
 String? validateSimilarPassword(String? password, String? inputtedPassword) {
+  print('pass: $password, newpass: $inputtedPassword');
   if (password == null || password.trim() == "") {
     return "Please re-enter your password";
   }
   if (password != inputtedPassword) {
     return 'Passwords do not match';
-    print('pass: $password, newpass: $inputtedPassword');
   }
   return null;
 }

@@ -99,24 +99,28 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   }
 }
 
-class CustomForm extends StatelessWidget {
+class CustomForm extends StatefulWidget {
   CustomForm({
     super.key,
     required this.onPressed,
     required this.formKey,
   });
 
-  void _update(String? confirmPassword) {
-    _confirmPassword = confirmPassword;
-  }
-
-  String? _confirmPassword = "";
   final VoidCallback onPressed;
   final GlobalKey<FormState> formKey;
+
+  @override
+  State<CustomForm> createState() => _CustomFormState();
+}
+
+class _CustomFormState extends State<CustomForm> {
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: formKey,
+      key: widget.formKey,
       child: Padding(
         padding: EdgeInsets.only(
           left: left_margin_form.w,
@@ -128,18 +132,19 @@ class CustomForm extends StatelessWidget {
             CustomTextField(
               icon: null,
               hintText: hint_text_new_password,
+              controller: passwordController,
               validator: (text) => validatePassword(text),
               isPassword: true,
-              onSaved: _update,
             ),
             SizedBox(
               height: space_between_form_button.h,
             ),
             CustomTextField(
-              hintText: text_title_new_password,
-              validator: (text) =>
-                  validateSimilarPassword(text, _confirmPassword),
               icon: null,
+              hintText: text_title_new_password,
+              controller: confirmPasswordController,
+              validator: (text) =>
+                  validateSimilarPassword(text, passwordController.text),
               isPassword: true,
             ),
             SizedBox(
@@ -147,7 +152,7 @@ class CustomForm extends StatelessWidget {
             ),
             CustomButton(
               text: text_button,
-              onPressed: onPressed,
+              onPressed: widget.onPressed,
             ),
           ],
         ),
