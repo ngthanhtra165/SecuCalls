@@ -9,11 +9,27 @@ const TextStyle textGray19Italic = TextStyle(
   fontStyle: FontStyle.italic,
 );
 
+const TextStyle textGray15Italic = TextStyle(
+  fontFamily: "ABeeZee",
+  fontWeight: FontWeight.w400,
+  fontSize: 15,
+  color: Colors.grey,
+  fontStyle: FontStyle.italic,
+);
+
 const TextStyle textWhite19Italic = TextStyle(
   fontFamily: "ABeeZee",
   fontWeight: FontWeight.w400,
   fontSize: 19,
   color: Colors.white,
+  fontStyle: FontStyle.italic,
+);
+
+const TextStyle textBlack19Italic = TextStyle(
+  fontFamily: "ABeeZee",
+  fontWeight: FontWeight.w400,
+  fontSize: 19,
+  color: Colors.black,
   fontStyle: FontStyle.italic,
 );
 
@@ -110,6 +126,14 @@ const TextStyle textBlack19 = TextStyle(
   fontFamily: "ABeeZee",
   fontWeight: FontWeight.w400,
   fontSize: 19,
+  color: Colors.black,
+  fontStyle: FontStyle.normal,
+);
+
+const TextStyle textBlack18 = TextStyle(
+  fontFamily: "ABeeZee",
+  fontWeight: FontWeight.w400,
+  fontSize: 18,
   color: Colors.black,
   fontStyle: FontStyle.normal,
 );
