@@ -1,11 +1,22 @@
+// ignore_for_file: use_build_context_synchronously, unused_local_variable
+
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:call_log/call_log.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hive/hive.dart';
+import 'package:phone_state_background/phone_state_background.dart';
 import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/constants.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/login/login_screen_def.dart';
+import 'package:secucalls/service/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,14 +27,74 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _initMonitoringIncomingCall();
   }
 
+  void _initMonitoringIncomingCall() async {
+    final Iterable<CallLogEntry> cLog = await CallLog.get();
+    final status = await FlutterOverlayWindow.isPermissionGranted();
+    if (!status) {
+      await FlutterOverlayWindow.requestPermission();
+    }
+    final permission = await PhoneStateBackground.checkPermission();
+    if (permission) {
+      log("prepare ");
+      await PhoneStateBackground.initialize(
+          phoneStateBackgroundCallbackHandler);
+    } else {
+      log("prepare ");
+      await PhoneStateBackground.requestPermissions();
+      Timer.periodic(const Duration(seconds: 1), (timer) async {
+        final permission = await PhoneStateBackground.checkPermission();
+        if (permission) {
+          await PhoneStateBackground.initialize(
+              phoneStateBackgroundCallbackHandler);
+        }
+      });
+    }
+  }
+
+  @pragma("vm:entry-point")
+  Future<void> phoneStateBackgroundCallbackHandler(
+    PhoneStateBackgroundEvent event,
+    String number,
+    int duration,
+  ) async {
+    print("is hehe $event");
+    switch (event) {
+      case PhoneStateBackgroundEvent.incomingstart:
+        log('Incoming call start, number: $number, duration: $duration s');
+        final SharedPreferences pref = await SharedPreferences.getInstance();
+        await pref.setString("number_call", number);
+        if (await FlutterOverlayWindow.isActive()) return;
+        log("show pop up");
+        await FlutterOverlayWindow.showOverlay();
+        break;
+      case PhoneStateBackgroundEvent.incomingmissed:
+        log('Incoming call missed, number: $number, duration: $duration s');
+        break;
+      case PhoneStateBackgroundEvent.incomingreceived:
+        log('Incoming call received, number: $number, duration: $duration s');
+        break;
+      case PhoneStateBackgroundEvent.incomingend:
+        log('Incoming call ended, number: $number, duration $duration s');
+        break;
+      case PhoneStateBackgroundEvent.outgoingstart:
+        log('Ougoing call start, number: $number, duration: $duration s');
+        break;
+      case PhoneStateBackgroundEvent.outgoingend:
+        log('Ougoing call ended, number: $number, duration: $duration s');
+        break;
+    }
+  }
+
+  @override
   void dispose() {
     // Close the keyboard when the widget is disposed
     FocusScope.of(context).unfocus();
@@ -31,21 +102,32 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void tapOnLoginButton() async {
-    var name = phoneController.text;
-    var email = passwordController.text;
+    var email = emailController.text;
+    var pass = passwordController.text;
+    log('Name: $email, Email: $pass');
+    try {
+      // final response = await APIService.shared.loginUser(email, pass);
+      //addStringIntoHive("token" , [response["access_token"] ,response["refresh_token"] ]);
 
-    // Do something with the entered data
-    print('Name: $name, Email: $email');
-    Navigator.of(context).pushNamed('/Dashboard');
+      Navigator.of(context).pushNamed('/Dashboard');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+          ),
+        ),
+      );
+    }
   }
 
   void tapOnRegisterButton() async {
-    print('move to register');
+    log('move to register');
     Navigator.of(context).pushNamed('/Register');
   }
 
   void tapOnForgetPasswordButton() async {
-    print('move to register');
+    log('move to register');
     Navigator.of(context).pushNamed('/ForgetPassword');
   }
 
@@ -73,6 +155,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: top_margin_form.h,
                   ),
                   CustomForm(
+                    mailController: emailController,
+                    passwordController: passwordController,
                     onTapButton: tapOnLoginButton,
                   ),
                   RegisterAndForgetPasswordButtons(
@@ -171,9 +255,16 @@ class LogoAndCompanyName extends StatelessWidget {
 
 // Custom form widget containing multiple CustomTextField widgets
 class CustomForm extends StatelessWidget {
-  const CustomForm({super.key, required this.onTapButton});
+  const CustomForm({
+    super.key,
+    required this.onTapButton,
+    required this.mailController,
+    required this.passwordController,
+  });
 
   final VoidCallback onTapButton;
+  final TextEditingController mailController;
+  final TextEditingController passwordController;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -184,9 +275,13 @@ class CustomForm extends StatelessWidget {
       child: Column(
         children: [
           CustomTextField(
+            controller: mailController,
             icon: Icons.alternate_email,
             hintText: text_mail,
             validator: (text) {
+              if (text == null || text.trim() == "") {
+                return "Empty email!";
+              }
               return null;
             },
           ),
@@ -194,9 +289,13 @@ class CustomForm extends StatelessWidget {
             height: space_between_text_field.h,
           ),
           CustomTextField(
+            controller: passwordController,
             icon: Icons.lock_outline,
             hintText: text_password,
-            validator: (Text) {
+            validator: (text) {
+              if (text == null || text.trim() == "") {
+                return "Empty password!";
+              }
               return null;
             },
             isPassword: true,

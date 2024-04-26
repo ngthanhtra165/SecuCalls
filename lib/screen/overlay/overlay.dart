@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TrueCallerOverlay extends StatefulWidget {
   const TrueCallerOverlay({Key? key}) : super(key: key);
@@ -25,7 +26,19 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
   void initState() {
     super.initState();
     // call api //
+    _getNumberOfIncomingCall();
+  }
 
+  String number = "";
+  void _getNumberOfIncomingCall() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    final int? counter = pref.getInt('number_call');
+    log("number call is $counter");
+    setState(() {
+      if (counter != null) {
+      number = counter as String;
+      }
+    });
   }
 
   @override
@@ -79,19 +92,19 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
                     ),
                     const Spacer(),
                     const Divider(color: Colors.black54),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("+216 21065826"),
-                              Text("Last call - 1 min ago"),
+                              Text(number),
+                              const Text("Last call - 1 min ago"),
                             ],
                           ),
-                          Text(
+                          const Text(
                             "SecuCalls",
                             style: TextStyle(
                                 fontSize: 15.0, fontWeight: FontWeight.bold),

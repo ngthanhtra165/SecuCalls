@@ -1,3 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/appbar.dart';
@@ -18,6 +22,7 @@ class ForgetPasswordScreen extends StatefulWidget {
 
 class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController emailController = TextEditingController();
 
   @override
   void initState() {
@@ -30,22 +35,34 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   }
 
   void tapOnRegisterButton() {
-    print('move to register');
+    log('move to register');
     Navigator.of(context).pushNamed('/Register');
   }
 
-  void tapOnForgetPasswordButton() {
-    print('move to forget password');
+  void tapOnForgetPasswordButton() async {
+    log('move to forget password');
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
+
     if (isValid == true) {
       _formKey.currentState?.save();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Processing Data')));
 
       // wait server response
+      try {
+        final email = emailController.text;
+        // final response = await APIService.shared.forgetPassword(email);
 
-      Navigator.of(context).pushNamed('/OTPValidation');
+        Navigator.of(context).pushNamed('/OTPValidation');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString(),
+            ),
+          ),
+        );
+      }
+
       return;
     }
   }
@@ -74,6 +91,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                 height: top_margin_form.h,
               ),
               CustomForm(
+                controller: emailController,
                 onPressed: tapOnForgetPasswordButton,
                 formKey: _formKey,
               ),
@@ -104,10 +122,12 @@ class CustomForm extends StatelessWidget {
     super.key,
     required this.onPressed,
     required this.formKey,
+    required this.controller,
   });
 
   final VoidCallback onPressed;
   final GlobalKey<FormState> formKey;
+  final TextEditingController controller;
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -121,6 +141,7 @@ class CustomForm extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             CustomTextField(
+              controller: controller,
               icon: Icons.alternate_email,
               hintText: hint_text_email,
               validator: (text) => validateEmail(text),

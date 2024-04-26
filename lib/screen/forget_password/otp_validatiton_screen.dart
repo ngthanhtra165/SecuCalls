@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/appbar.dart';
@@ -6,6 +8,7 @@ import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/forget_password/forget_password_def.dart';
+import 'package:secucalls/service/hive.dart';
 import 'package:secucalls/utils/validate.dart';
 
 class OTPValidationScreen extends StatefulWidget {
@@ -18,7 +21,7 @@ class OTPValidationScreen extends StatefulWidget {
 
 class _OTPValidationScreenState extends State<OTPValidationScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+  final TextEditingController otpController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -34,17 +37,30 @@ class _OTPValidationScreenState extends State<OTPValidationScreen> {
     Navigator.of(context).pushNamed('/Register');
   }
 
-  void tapOnOTPValidationButton() {
+  void tapOnOTPValidationButton() async {
     print('move to forget password');
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
     if (isValid == true) {
       _formKey.currentState?.save();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Processing Data')));
 
       // wait server response
-      Navigator.of(context).pushNamed('/NewPassword');
+      try {
+        final otp = otpController.text;
+        // final response = await APIService.shared.otpValidation(otp);
+        //addStringIntoHive("token_otp", [response["otp_token"]]);
+
+        Navigator.of(context).pushNamed('/NewPassword');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString(),
+            ),
+          ),
+        );
+      }
+
       return;
     }
   }
@@ -73,6 +89,7 @@ class _OTPValidationScreenState extends State<OTPValidationScreen> {
                 height: top_margin_form_otp.h,
               ),
               CustomForm(
+                controller: otpController,
                 onPressed: tapOnOTPValidationButton,
                 formKey: _formKey,
               ),
@@ -103,8 +120,10 @@ class CustomForm extends StatelessWidget {
     super.key,
     required this.onPressed,
     required this.formKey,
+    required this.controller,
   });
 
+  final TextEditingController controller;
   final VoidCallback onPressed;
   final GlobalKey<FormState> formKey;
   @override
@@ -120,6 +139,7 @@ class CustomForm extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             CustomTextField(
+              controller: controller,
               icon: null,
               hintText: hint_text_otp,
               validator: (text) => validateOTP(text),

@@ -1,6 +1,10 @@
 {
     "cSpell.words": [
+        "incomingmissed",
+        "incomingstart",
         "screenutil",
         "secucalls"
-    ]
+    ],
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

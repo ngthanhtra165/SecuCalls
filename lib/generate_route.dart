@@ -24,7 +24,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case "/NewPassword":
       return _createRoute(const NewPasswordScreen());
           case "/CallLog":
-      return _createRoute(CallLogScreen());
+      return _createRoute(const CallLogScreen());
     default:
       return _createRoute(const LoginScreen());
   }

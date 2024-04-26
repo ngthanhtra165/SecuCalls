@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,7 +10,7 @@ import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/call_log/call_log_screen_def.dart';
 
 class CallLogScreen extends StatefulWidget {
-  CallLogScreen({super.key});
+  const CallLogScreen({super.key});
 
   @override
   State<CallLogScreen> createState() => _CallLogScreenState();
@@ -33,19 +35,20 @@ class _CallLogScreenState extends State<CallLogScreen>
   }
 
   void _getCallLogs() async {
-    // var entries = await CallLog.get();
-    // print("recentCalls $entries");
-    // setState(() {
-    //   recentCalls = entries
-    //       .where((entry) =>
-    //           entry.callType == CallType.outgoing ||
-    //           entry.callType == CallType.incoming).cast<String>().toList();
-    //   missedCalls = entries.where((entry) => entry.callType == CallType.missed).cast<String>().toList();
-    // })
-    // ;
     final Iterable<CallLogEntry> cLog = await CallLog.get();
     print('Queried call log entries');
     for (CallLogEntry entry in cLog) {
+      print('-------------------------------------');
+      print('F. NUMBER  : ${entry.formattedNumber}');
+      print('C.M. NUMBER: ${entry.cachedMatchedNumber}');
+      print('NUMBER     : ${entry.number}');
+      print('NAME       : ${entry.name}');
+      print('TYPE       : ${entry.callType}');
+      print('DURATION   : ${entry.duration}');
+      print('ACCOUNT ID : ${entry.phoneAccountId}');
+      print('ACCOUNT ID : ${entry.phoneAccountId}');
+      print('SIM NAME   : ${entry.simDisplayName}');
+      print('-------------------------------------');
       late final TypeOfCall typeOfCall;
       switch (entry.callType) {
         case CallType.incoming:
@@ -54,7 +57,7 @@ class _CallLogScreenState extends State<CallLogScreen>
           typeOfCall = TypeOfCall.missed;
           setState(() {
             missedCalls.add((
-              entry.cachedMatchedNumber,
+              entry.number,
               checkInfo(entry.cachedMatchedNumber),
               typeOfCall
             ) as (String, String, TypeOfCall));
@@ -67,7 +70,7 @@ class _CallLogScreenState extends State<CallLogScreen>
       }
       setState(() {
         recentCalls.add((
-          entry.cachedMatchedNumber,
+          entry.number,
           checkInfo(entry.cachedMatchedNumber),
           typeOfCall
         ) as (String, String, TypeOfCall));

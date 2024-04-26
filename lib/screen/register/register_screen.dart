@@ -134,7 +134,7 @@ class CustomForm extends StatelessWidget {
               height: space_between_text_fields.h,
             ),
             CustomTextField(
-              icon: Icons.phone,
+              icon: Icons.alternate_email,
               hintText: hint_text_email,
               validator: (text) => validateEmail(text),
             ),

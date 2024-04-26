@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/appbar.dart';
@@ -18,6 +20,8 @@ class NewPasswordScreen extends StatefulWidget {
 
 class _NewPasswordScreenState extends State<NewPasswordScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
 
   @override
   void initState() {
@@ -30,21 +34,32 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   }
 
   void tapOnRegisterButton() {
-    print('move to register');
+    log('move to register');
     Navigator.of(context).pushNamed('/Register');
   }
 
   void tapOnNewPasswordButton() {
-    print('move to forget password');
+    log('move to forget password');
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
     if (isValid == true) {
       _formKey.currentState?.save();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Processing Data')));
 
       // wait server response
-
+      try {
+        final password = passwordController.text;
+        final confirmPassword = confirmPasswordController.text;
+        final otp = 
+        // final response = await APIService.shared.forgetPassword(email);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString(),
+            ),
+          ),
+        );
+      }
       //Navigator.of(context).pushNamed('/');
       return;
     }
@@ -76,6 +91,8 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
               CustomForm(
                 onPressed: tapOnNewPasswordButton,
                 formKey: _formKey,
+                passwordController: passwordController,
+                confirmPasswordController: confirmPasswordController,
               ),
               SizedBox(
                 height: top_margin_register_button_new_password.h,
@@ -100,23 +117,23 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
 }
 
 class CustomForm extends StatefulWidget {
-  CustomForm({
+  const CustomForm({
     super.key,
     required this.onPressed,
     required this.formKey,
+    required this.passwordController,
+    required this.confirmPasswordController,
   });
 
   final VoidCallback onPressed;
   final GlobalKey<FormState> formKey;
-
+  final TextEditingController passwordController;
+  final TextEditingController confirmPasswordController;
   @override
   State<CustomForm> createState() => _CustomFormState();
 }
 
 class _CustomFormState extends State<CustomForm> {
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -132,7 +149,7 @@ class _CustomFormState extends State<CustomForm> {
             CustomTextField(
               icon: null,
               hintText: hint_text_new_password,
-              controller: passwordController,
+              controller: widget.passwordController,
               validator: (text) => validatePassword(text),
               isPassword: true,
             ),
@@ -142,9 +159,9 @@ class _CustomFormState extends State<CustomForm> {
             CustomTextField(
               icon: null,
               hintText: text_title_new_password,
-              controller: confirmPasswordController,
+              controller: widget.confirmPasswordController,
               validator: (text) =>
-                  validateSimilarPassword(text, passwordController.text),
+                  validateSimilarPassword(text, widget.passwordController.text),
               isPassword: true,
             ),
             SizedBox(
