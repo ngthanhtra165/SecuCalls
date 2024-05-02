@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -8,6 +10,9 @@ import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/forget_password/forget_password_def.dart';
+import 'package:secucalls/service/api_service.dart';
+import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/service/overlay_manager.dart';
 import 'package:secucalls/utils/validate.dart';
 
 class NewPasswordScreen extends StatefulWidget {
@@ -38,7 +43,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     Navigator.of(context).pushNamed('/Register');
   }
 
-  void tapOnNewPasswordButton() {
+  void tapOnNewPasswordButton() async {
     log('move to forget password');
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
@@ -49,9 +54,23 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
       try {
         final password = passwordController.text;
         final confirmPassword = confirmPasswordController.text;
-        final otp = 
-        // final response = await APIService.shared.forgetPassword(email);
+        final otp_token = await getString("otp_token", "otp_token");
+
+        OverlayIndicatorManager.show(context);
+
+        Future.delayed(const Duration(seconds: 1), () async {
+          final response = await APIService.shared.setPassword(
+            otp_token,
+            password,
+            confirmPassword,
+          );
+          //clearBox("token_otp");
+          OverlayIndicatorManager.hide();
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/Login', (route) => false);
+        });
       } catch (e) {
+        OverlayIndicatorManager.hide();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(

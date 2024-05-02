@@ -5,14 +5,14 @@ const double top_margin_logo = 35;
 const double left_margin_logo = 124;
 const double top_margin_form = 80;
 const double left_margin_form = 35;
-const double space_between_text_field = 15;
+const double space_between_text_field = 10;
 
 const double top_margin_two_buttons = 20;
 
 const double heigh_two_buttons = 60;
 
 const String name_company = "SecuCalls";
-const String text_mail = "Email";
+const String text_phone = "Số điện thoại";
 const String text_password = "Mật khẩu";
 const String text_button = "Đăng nhập";
 const String text_register_button = "Đăng ký";

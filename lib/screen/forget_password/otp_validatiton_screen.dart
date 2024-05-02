@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/appbar.dart';
@@ -8,7 +10,9 @@ import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/forget_password/forget_password_def.dart';
+import 'package:secucalls/service/api_service.dart';
 import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/service/overlay_manager.dart';
 import 'package:secucalls/utils/validate.dart';
 
 class OTPValidationScreen extends StatefulWidget {
@@ -38,7 +42,7 @@ class _OTPValidationScreenState extends State<OTPValidationScreen> {
   }
 
   void tapOnOTPValidationButton() async {
-    print('move to forget password');
+    log('move to forget password');
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
     if (isValid == true) {
@@ -47,11 +51,17 @@ class _OTPValidationScreenState extends State<OTPValidationScreen> {
       // wait server response
       try {
         final otp = otpController.text;
-        // final response = await APIService.shared.otpValidation(otp);
-        //addStringIntoHive("token_otp", [response["otp_token"]]);
+        OverlayIndicatorManager.show(context);
+
+        final response = await APIService.shared.otpValidation(otp);
+        OverlayIndicatorManager.hide();
+
+        //("token_otp");
+        addStringIntoBox("token_otp", {"otp_token": response["otp_token"]});
 
         Navigator.of(context).pushNamed('/NewPassword');
       } catch (e) {
+        OverlayIndicatorManager.hide();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(

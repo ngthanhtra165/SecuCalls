@@ -10,6 +10,9 @@ import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/forget_password/forget_password_def.dart';
+import 'package:secucalls/service/api_service.dart';
+import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/service/overlay_manager.dart';
 import 'package:secucalls/utils/validate.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
@@ -50,10 +53,15 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       // wait server response
       try {
         final email = emailController.text;
-        // final response = await APIService.shared.forgetPassword(email);
+        OverlayIndicatorManager.show(context);
+        await Future.delayed(const Duration(seconds: 1), () async {
+          final response = await APIService.shared.forgetPassword(email);
+          OverlayIndicatorManager.hide();
 
-        Navigator.of(context).pushNamed('/OTPValidation');
+          Navigator.of(context).pushNamed('/OTPValidation');
+        });
       } catch (e) {
+        OverlayIndicatorManager.hide();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -73,7 +81,6 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       designSize: fullScreenPortraitSize,
       child: SafeArea(
         child: Scaffold(
-          // You can design your splash screen UI here
           resizeToAvoidBottomInset: false,
           appBar: CustomAppBar(
             icon: Icons.arrow_back_ios_rounded,
@@ -108,7 +115,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   onPressed: tapOnRegisterButton,
                   textAlign: TextAlign.center,
                 ),
-              )
+              ),
             ],
           ),
         ),

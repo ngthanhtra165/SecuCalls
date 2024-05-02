@@ -1,5 +1,7 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/drawer.dart';
@@ -7,6 +9,8 @@ import 'package:secucalls/common/radial_chart.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/dashboard/dashboard_screen_def.dart';
+import 'package:secucalls/service/api_service.dart';
+import 'package:secucalls/service/hive.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -33,18 +37,31 @@ class _DashboardScreenState extends State<DashboardScreen>
     _scaffoldKey.currentState?.openEndDrawer();
   }
 
-  void tapOnLogOutButton() {
-    print('move to log out');
-    Navigator.pushNamedAndRemoveUntil(context, '/Login', (route) => false);
+  void tapOnLogOutButton() async {
+    log('move to log out');
+    try {
+      final response = await APIService.shared.logoutUser();
+      clearBox("token");
+      clearBox("otp_token");
+      Navigator.pushNamedAndRemoveUntil(context, '/Login', (route) => false);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+          ),
+        ),
+      );
+    }
   }
 
   void tapOnHomeButton() {
-    print('home');
+    log('home');
     _scaffoldKey.currentState?.openEndDrawer();
   }
 
   void tapOnCallLogButton() {
-    print('move to call log');
+    log('move to call log');
     Navigator.of(context).pushNamed('/CallLog');
     _scaffoldKey.currentState?.openEndDrawer();
   }
@@ -93,12 +110,6 @@ class _DashboardScreenState extends State<DashboardScreen>
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _tabController.dispose();
   }
 }
 

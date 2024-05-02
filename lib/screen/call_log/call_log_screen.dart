@@ -35,47 +35,47 @@ class _CallLogScreenState extends State<CallLogScreen>
   }
 
   void _getCallLogs() async {
-    final Iterable<CallLogEntry> cLog = await CallLog.get();
-    print('Queried call log entries');
-    for (CallLogEntry entry in cLog) {
-      print('-------------------------------------');
-      print('F. NUMBER  : ${entry.formattedNumber}');
-      print('C.M. NUMBER: ${entry.cachedMatchedNumber}');
-      print('NUMBER     : ${entry.number}');
-      print('NAME       : ${entry.name}');
-      print('TYPE       : ${entry.callType}');
-      print('DURATION   : ${entry.duration}');
-      print('ACCOUNT ID : ${entry.phoneAccountId}');
-      print('ACCOUNT ID : ${entry.phoneAccountId}');
-      print('SIM NAME   : ${entry.simDisplayName}');
-      print('-------------------------------------');
-      late final TypeOfCall typeOfCall;
-      switch (entry.callType) {
-        case CallType.incoming:
-          typeOfCall = TypeOfCall.incoming;
-        case CallType.missed:
-          typeOfCall = TypeOfCall.missed;
-          setState(() {
-            missedCalls.add((
-              entry.number,
-              checkInfo(entry.cachedMatchedNumber),
-              typeOfCall
-            ) as (String, String, TypeOfCall));
-          });
+    // final Iterable<CallLogEntry> cLog = await CallLog.get();
+    // print('Queried call log entries');
+    // for (CallLogEntry entry in cLog) {
+    //   print('-------------------------------------');
+    //   print('F. NUMBER  : ${entry.formattedNumber}');
+    //   print('C.M. NUMBER: ${entry.cachedMatchedNumber}');
+    //   print('NUMBER     : ${entry.number}');
+    //   print('NAME       : ${entry.name}');
+    //   print('TYPE       : ${entry.callType}');
+    //   print('DURATION   : ${entry.duration}');
+    //   print('ACCOUNT ID : ${entry.phoneAccountId}');
+    //   print('ACCOUNT ID : ${entry.phoneAccountId}');
+    //   print('SIM NAME   : ${entry.simDisplayName}');
+    //   print('-------------------------------------');
+    //   late final TypeOfCall typeOfCall;
+    //   switch (entry.callType) {
+    //     case CallType.incoming:
+    //       typeOfCall = TypeOfCall.incoming;
+    //     case CallType.missed:
+    //       typeOfCall = TypeOfCall.missed;
+    //       setState(() {
+    //         missedCalls.add((
+    //           entry.number,
+    //           checkInfo(entry.cachedMatchedNumber),
+    //           typeOfCall
+    //         ) as (String, String, TypeOfCall));
+    //       });
 
-        case CallType.outgoing:
-          typeOfCall = TypeOfCall.outgoing;
-        default:
-          typeOfCall = TypeOfCall.outgoing;
-      }
-      setState(() {
-        recentCalls.add((
-          entry.number,
-          checkInfo(entry.cachedMatchedNumber),
-          typeOfCall
-        ) as (String, String, TypeOfCall));
-      });
-    }
+    //     case CallType.outgoing:
+    //       typeOfCall = TypeOfCall.outgoing;
+    //     default:
+    //       typeOfCall = TypeOfCall.outgoing;
+    //   }
+    //   setState(() {
+    //     recentCalls.add((
+    //       entry.number,
+    //       checkInfo(entry.cachedMatchedNumber),
+    //       typeOfCall
+    //     ) as (String, String, TypeOfCall));
+    //   });
+    // }
   }
 
   String checkInfo(String? number) {

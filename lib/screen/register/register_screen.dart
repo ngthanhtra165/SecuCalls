@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/appbar.dart';
@@ -5,6 +7,9 @@ import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/screen/register/register_screen_def.dart';
+import 'package:secucalls/service/api_service.dart';
+import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/service/overlay_manager.dart';
 import 'package:secucalls/utils/validate.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -17,6 +22,11 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   void initState() {
@@ -28,21 +38,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
     Navigator.of(context).pop();
   }
 
-  void tapOnRegisterButton() {
-    print('move to register');
-    //Navigator.of(context).pushNamed('/Register');
+  void tapOnRegisterButton() async {
+    FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
+
     if (isValid == true) {
-      _formKey.currentState?.save();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Processing Data')));
-      // wait server response
-      return;
+      final firstName = firstNameController.text;
+      final lastName = lastNameController.text;
+      final email = emailController.text;
+      final phone = phoneController.text;
+      final password = passwordController.text;
+
+      OverlayIndicatorManager.show(context);
+      try {
+        await Future.delayed(const Duration(seconds: 1), () async {
+          final response = await APIService.shared
+              .registerUser(firstName, lastName, email, phone, password);
+          OverlayIndicatorManager.hide();
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/Login', (route) => false);
+        });
+      } catch (e) {
+        OverlayIndicatorManager.hide();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString(),
+            ),
+          ),
+        );
+      }
     }
   }
 
   void tapOnForgetPasswordButton() {
-    print('move to forget password');
+    log('move to forget password');
     Navigator.of(context).pushNamed('/ForgetPassword');
   }
 
@@ -70,6 +100,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   CustomForm(
                     onPressed: tapOnRegisterButton,
                     form: _formKey,
+                    firstNameController: firstNameController,
+                    lastNameController: lastNameController,
+                    emailController: emailController,
+                    passwordController: passwordController,
+                    phoneController: phoneController,
                   ),
                   SizedBox(
                     height: top_margin_forget_password_button.h,
@@ -99,11 +134,21 @@ class CustomForm extends StatelessWidget {
     super.key,
     required this.onPressed,
     required this.form,
+    required this.firstNameController,
+    required this.lastNameController,
+    required this.emailController,
+    required this.passwordController,
+    required this.phoneController,
   });
 
   final GlobalKey<FormState> form;
   final VoidCallback onPressed;
-  
+  final TextEditingController firstNameController;
+  final TextEditingController lastNameController;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final TextEditingController phoneController;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -118,6 +163,7 @@ class CustomForm extends StatelessWidget {
               height: top_margin_form.h,
             ),
             CustomTextField(
+              controller: lastNameController,
               icon: Icons.account_box_outlined,
               hintText: hint_text_last_name,
               validator: (text) => validateName(text),
@@ -126,6 +172,7 @@ class CustomForm extends StatelessWidget {
               height: space_between_text_fields.h,
             ),
             CustomTextField(
+              controller: firstNameController,
               icon: Icons.account_box_outlined,
               hintText: hint_text_first_name,
               validator: (text) => validateName(text),
@@ -134,6 +181,7 @@ class CustomForm extends StatelessWidget {
               height: space_between_text_fields.h,
             ),
             CustomTextField(
+              controller: emailController,
               icon: Icons.alternate_email,
               hintText: hint_text_email,
               validator: (text) => validateEmail(text),
@@ -142,6 +190,16 @@ class CustomForm extends StatelessWidget {
               height: space_between_text_fields.h,
             ),
             CustomTextField(
+              controller: phoneController,
+              icon: Icons.phone,
+              hintText: hint_text_phone,
+              validator: (text) => validatePhoneNumber(text),
+            ),
+            SizedBox(
+              height: space_between_text_fields.h,
+            ),
+            CustomTextField(
+              controller: passwordController,
               icon: Icons.lock_outline,
               hintText: hint_text_password,
               validator: (text) => validatePassword(text),

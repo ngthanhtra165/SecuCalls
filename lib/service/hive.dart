@@ -1,17 +1,34 @@
-
-
 import 'package:hive/hive.dart';
 
-void addStringIntoHive(String name, List<dynamic> infos) async {
+void addStringIntoBox(String name, Map<String, dynamic> infos) async {
   if (!Hive.isBoxOpen(name)) {
-    await Hive.openBox<String>(name);
+    await Hive.openBox(name);
   }
-  final Box<String> box = Hive.box<String>(name);
-  for (String info in infos) {
-    box.add(info);
+  final Box box = Hive.box(name);
+  for (final info in infos.entries) {
+    box.put(info.key, info.value);
   }
 }
 
-String getString(String name , int position) {
-  
+Future<String?> getString(String name, String key) async {
+  if (!Hive.isBoxOpen(name)) {
+    print('box is open $name');
+    await Hive.openBox(name);
+  }
+  final Box box = Hive.box(name);
+  print("box is $box");
+  return await box.get(key);
+}
+
+void resetToken() async {
+  await Hive.openBox("refresh");
+  Hive.close();
+}
+
+void clearBox(String name) async {
+  if (!Hive.isBoxOpen(name)) {
+    await Hive.openBox(name);
+  }
+  final Box box = Hive.box(name);
+  box.clear();
 }

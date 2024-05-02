@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, unused_local_variable
+// ignore_for_file: use_build_context_synchronously, unused_local_variable, library_private_types_in_public_api
 
 import 'dart:async';
 import 'dart:developer';
@@ -7,7 +7,6 @@ import 'package:call_log/call_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hive/hive.dart';
 import 'package:phone_state_background/phone_state_background.dart';
 import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/text_field.dart';
@@ -16,28 +15,30 @@ import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/login/login_screen_def.dart';
 import 'package:secucalls/service/api_service.dart';
+import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/service/overlay_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _initMonitoringIncomingCall();
+    //_initMonitoringIncomingCall();
   }
 
   void _initMonitoringIncomingCall() async {
     final Iterable<CallLogEntry> cLog = await CallLog.get();
+    // save data into local
     final status = await FlutterOverlayWindow.isPermissionGranted();
     if (!status) {
       await FlutterOverlayWindow.requestPermission();
@@ -66,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String number,
     int duration,
   ) async {
-    print("is hehe $event");
+    log("is hehe $event");
     switch (event) {
       case PhoneStateBackgroundEvent.incomingstart:
         log('Incoming call start, number: $number, duration: $duration s');
@@ -94,31 +95,33 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    // Close the keyboard when the widget is disposed
-    FocusScope.of(context).unfocus();
-    super.dispose();
-  }
-
   void tapOnLoginButton() async {
-    var email = emailController.text;
-    var pass = passwordController.text;
-    log('Name: $email, Email: $pass');
-    try {
-      // final response = await APIService.shared.loginUser(email, pass);
-      //addStringIntoHive("token" , [response["access_token"] ,response["refresh_token"] ]);
-
-      Navigator.of(context).pushNamed('/Dashboard');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
+    FocusScope.of(context).unfocus();
+    final phone = phoneController.text;
+    final pass = passwordController.text;
+    log('Name: $phone, Email: $pass');
+    OverlayIndicatorManager.show(context);
+    await Future.delayed(const Duration(seconds: 1), () async {
+      try {
+        final response = await APIService.shared.loginUser(phone, pass);
+        Navigator.of(context).pushNamed('/Dashboard');
+        OverlayIndicatorManager.hide();
+        addStringIntoBox("token", {
+          "access_token": response["access_token"],
+          "refresh_token": response["refresh_token"],
+        });
+      } catch (e) {
+        OverlayIndicatorManager.hide();
+        passwordController.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString(),
+            ),
           ),
-        ),
-      );
-    }
+        );
+      }
+    });
   }
 
   void tapOnRegisterButton() async {
@@ -155,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: top_margin_form.h,
                   ),
                   CustomForm(
-                    mailController: emailController,
+                    phoneController: phoneController,
                     passwordController: passwordController,
                     onTapButton: tapOnLoginButton,
                   ),
@@ -258,12 +261,12 @@ class CustomForm extends StatelessWidget {
   const CustomForm({
     super.key,
     required this.onTapButton,
-    required this.mailController,
+    required this.phoneController,
     required this.passwordController,
   });
 
   final VoidCallback onTapButton;
-  final TextEditingController mailController;
+  final TextEditingController phoneController;
   final TextEditingController passwordController;
   @override
   Widget build(BuildContext context) {
@@ -275,12 +278,12 @@ class CustomForm extends StatelessWidget {
       child: Column(
         children: [
           CustomTextField(
-            controller: mailController,
-            icon: Icons.alternate_email,
-            hintText: text_mail,
+            controller: phoneController,
+            icon: Icons.phone,
+            hintText: text_phone,
             validator: (text) {
               if (text == null || text.trim() == "") {
-                return "Empty email!";
+                return "Empty phone!";
               }
               return null;
             },

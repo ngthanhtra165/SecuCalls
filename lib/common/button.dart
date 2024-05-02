@@ -21,10 +21,10 @@ class CustomButton extends StatelessWidget {
       child: TextButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(
-              Color(0xFF266CBF),
+              const Color(0xFF266CBF),
             ), // Set the background color
             side: MaterialStateProperty.all<BorderSide>(
-              BorderSide(color: Colors.grey),
+              const BorderSide(color: Colors.grey),
             ),
             shape: MaterialStateProperty.all<OutlinedBorder>(
               RoundedRectangleBorder(
