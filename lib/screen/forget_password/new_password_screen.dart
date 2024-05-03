@@ -55,10 +55,10 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
         final password = passwordController.text;
         final confirmPassword = confirmPasswordController.text;
         final otp_token = await getString("otp_token", "otp_token");
-
         OverlayIndicatorManager.show(context);
+        
+        await Future.delayed(const Duration(seconds: 1), () async {
 
-        Future.delayed(const Duration(seconds: 1), () async {
           final response = await APIService.shared.setPassword(
             otp_token,
             password,

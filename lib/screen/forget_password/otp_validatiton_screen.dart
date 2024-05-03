@@ -13,6 +13,7 @@ import 'package:secucalls/screen/forget_password/forget_password_def.dart';
 import 'package:secucalls/service/api_service.dart';
 import 'package:secucalls/service/hive.dart';
 import 'package:secucalls/service/overlay_manager.dart';
+import 'package:secucalls/utils/token.dart';
 import 'package:secucalls/utils/validate.dart';
 
 class OTPValidationScreen extends StatefulWidget {
@@ -53,13 +54,15 @@ class _OTPValidationScreenState extends State<OTPValidationScreen> {
         final otp = otpController.text;
         OverlayIndicatorManager.show(context);
 
-        final response = await APIService.shared.otpValidation(otp);
-        OverlayIndicatorManager.hide();
-
-        //("token_otp");
-        addStringIntoBox("token_otp", {"otp_token": response["otp_token"]});
-
-        Navigator.of(context).pushNamed('/NewPassword');
+        await Future.delayed(
+          const Duration(seconds: 1),
+          () async {
+            final response = await APIService.shared.otpValidation(otp);
+            OverlayIndicatorManager.hide();
+            addStringIntoBox("token_otp", {"otp_token": extendTokenExpiry(response["otp_token"] , 5)});
+            Navigator.of(context).pushNamed('/NewPassword');
+          },
+        );
       } catch (e) {
         OverlayIndicatorManager.hide();
         ScaffoldMessenger.of(context).showSnackBar(
