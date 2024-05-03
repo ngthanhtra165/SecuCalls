@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-void addStringIntoBox(String name, Map<String, dynamic> infos) async {
+Future<void> addStringIntoBox(String name, Map<String, dynamic> infos) async {
   if (!Hive.isBoxOpen(name)) {
     await Hive.openBox(name);
   }
@@ -25,7 +25,7 @@ void resetToken() async {
   Hive.close();
 }
 
-void clearBox(String name) async {
+Future<void> clearBox(String name) async {
   if (!Hive.isBoxOpen(name)) {
     await Hive.openBox(name);
   }

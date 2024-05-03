@@ -59,7 +59,9 @@ class _OTPValidationScreenState extends State<OTPValidationScreen> {
           () async {
             final response = await APIService.shared.otpValidation(otp);
             OverlayIndicatorManager.hide();
-            addStringIntoBox("token_otp", {"otp_token": extendTokenExpiry(response["otp_token"] , 5)});
+            await clearBox("token_otp");
+            await addStringIntoBox("token_otp",
+                {"otp_token": extendTokenExpiry(response["otp_token"], 5)});
             Navigator.of(context).pushNamed('/NewPassword');
           },
         );

@@ -67,12 +67,19 @@ class APIService {
   Future<Map<String, dynamic>> forgetPassword(String email) async {
     const String apiUrl =
         '$baseURL/user/forgot-password'; // Replace '/login' with your API endpoint
+    print("$email");
 
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
     final response = await http.post(
       Uri.parse(apiUrl),
-      body: {
-        'email': email,
-      },
+      headers: headers,
+      body: jsonEncode(
+        {
+          "email": "tra16052002@gmail.com",
+        },
+      ),
     );
     final Map<String, dynamic> responseData = json.decode(response.body);
     if (response.statusCode == 200) {
@@ -91,10 +98,13 @@ class APIService {
     Map<String, String> headers = {
       "Content-Type": "application/json",
     };
-    final response =
-        await http.post(Uri.parse(apiUrl), headers: headers, body: {
-      'otp': otp,
-    });
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: headers,
+      body: jsonEncode({
+        'otp': otp,
+      }),
+    );
     final Map<String, dynamic> responseData = json.decode(response.body);
     if (response.statusCode == 200) {
       // If the server returns a 200 OK response, parse the JSON response
@@ -113,12 +123,15 @@ class APIService {
     Map<String, String> headers = {
       "Content-Type": "application/json",
     };
-    final response =
-        await http.post(Uri.parse(apiUrl), headers: headers, body: {
-      "otp_token": otp_token ?? "",
-      "new_password": password,
-      "re_enter_password": reEnterPassword
-    });
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      //headers: headers,
+      body: jsonEncode({
+        "otp_token": otp_token ?? "",
+        "new_password": password,
+        "re_enter_password": reEnterPassword
+      }),
+    );
     final Map<String, dynamic> responseData = json.decode(response.body);
     if (response.statusCode == 200) {
       // If the server returns a 200 OK response, parse the JSON response

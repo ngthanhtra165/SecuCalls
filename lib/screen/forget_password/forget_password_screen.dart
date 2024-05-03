@@ -47,7 +47,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
 
-    if (isValid == true) {
+    if (isValid == false) {
       _formKey.currentState?.save();
 
       // wait server response
