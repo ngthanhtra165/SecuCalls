@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/utils/token.dart';
 
 class APIService {
   static const String baseURL = "http://157.119.251.238";
@@ -18,8 +18,8 @@ class APIService {
       },
       body: jsonEncode(
         {
-          'phone': phone,
-          'password': password,
+          'phone': "0345827894",
+          'password': "Tra1605@gmail",
         },
       ),
     );
@@ -67,7 +67,6 @@ class APIService {
   Future<Map<String, dynamic>> forgetPassword(String email) async {
     const String apiUrl =
         '$baseURL/user/forgot-password'; // Replace '/login' with your API endpoint
-    print("$email");
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -77,7 +76,7 @@ class APIService {
       headers: headers,
       body: jsonEncode(
         {
-          "email": "tra16052002@gmail.com",
+          "email": email,
         },
       ),
     );
@@ -116,18 +115,19 @@ class APIService {
   }
 
   Future<Map<String, dynamic>> setPassword(
-      String? otp_token, String password, String reEnterPassword) async {
+      String? otpToken, String password, String reEnterPassword) async {
     const String apiUrl =
         '$baseURL/user/set-password'; // Replace '/login' with your API endpoint
 
     Map<String, String> headers = {
       "Content-Type": "application/json",
     };
+    print("otp token is $otpToken");
     final response = await http.post(
       Uri.parse(apiUrl),
-      //headers: headers,
+      headers: headers,
       body: jsonEncode({
-        "otp_token": otp_token ?? "",
+        "otp_token": otpToken ?? "",
         "new_password": password,
         "re_enter_password": reEnterPassword
       }),
@@ -145,17 +145,61 @@ class APIService {
   Future<Map<String, dynamic>> logoutUser() async {
     const String apiUrl =
         '$baseURL/user/logout'; // Replace '/login' with your API endpoint
-
-    Map<String, String> headers = {
-      "Content-Type": "application/json",
-    };
-    final access_token = await getString("token", "access_token");
-    print("access token is $access_token");
+    final accessToken = await getAccessToken();
+    print("access token is $accessToken");
     final response = await http.get(
       Uri.parse(apiUrl),
       headers: <String, String>{
         "Content-Type": "application/json",
-        'Authorization': 'Bearer $access_token',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final Map<String, dynamic> responseData = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON response
+      return responseData;
+    } else {
+      // If the server returns an error response, throw an exception
+      throw responseData["msg"];
+    }
+  }
+
+  Future<Map<String, dynamic>> refreshAccessToken() async {
+    const String apiUrl =
+        '$baseURL/user/refresh-token'; // Replace '/login' with your API endpoint
+
+    final refreshToken = await getString("token", "refresh_token") ?? "";
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        'refresh_token': refreshToken,
+      }),
+    );
+    final Map<String, dynamic> responseData = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON response
+      return responseData;
+    } else {
+      // If the server returns an error response, throw an exception
+      throw responseData["msg"];
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchData() async {
+    const String apiUrl =
+        '$baseURL/func/fetch'; // Replace '/login' with your API endpoint
+    final accessToken = await getAccessToken();
+    print("access token is $accessToken");
+    final response = await http.get(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer $accessToken',
       },
     );
     final Map<String, dynamic> responseData = json.decode(response.body);

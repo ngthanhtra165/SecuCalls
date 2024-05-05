@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 const String text_tab_bar_all = "Tất cả";
 const String text_tab_bar_missed_calls = "Gọi nhỡ";
 

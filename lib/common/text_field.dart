@@ -43,7 +43,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         obscureText: (widget.isPassword != null) ? passwordVisible : false,
         textAlign: TextAlign.left,
         decoration: InputDecoration(
-          errorStyle: TextStyle(fontSize: 10.5),
+          errorStyle: const TextStyle(fontSize: 10.5),
           prefixIcon: (widget.icon == null)
               ? null
               : Icon(

@@ -32,6 +32,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
 
 Route _createRoute(Widget toScreen) {
   return PageRouteBuilder(
+    transitionDuration: const Duration(milliseconds: 550),
     pageBuilder: (context, animation, secondaryAnimation) => toScreen,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(1.0, 0.0);

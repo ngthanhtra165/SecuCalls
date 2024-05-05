@@ -1,22 +1,6 @@
-import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:jwt_decode/jwt_decode.dart';
-
-String extendTokenExpiry(String token, int minutes) {
-  Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
-  if (decodedToken.containsKey('exp')) {
-    // Extend expiration time by 30 minutes
-    DateTime expiryTime = DateTime.fromMillisecondsSinceEpoch(
-        (decodedToken['exp'] * 1000) + (minutes * 60 * 1000));
-    decodedToken['exp'] = expiryTime.millisecondsSinceEpoch ~/ 1000;
-
-    // Encode the payload to create a new token
-    String newToken = base64Url.encode(utf8.encode(json.encode(decodedToken)));
-    print('new token is $newToken');
-    return newToken;
-  }
-  return token; // Return the original token if expiration time is not present
-}
+import 'package:secucalls/service/hive.dart';
+import '../service/api_service.dart';
 
 bool isTokenExpired(String token) {
   Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
@@ -25,5 +9,16 @@ bool isTokenExpired(String token) {
     int nowInSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     return nowInSeconds > expiryTime;
   }
-  return true; // Return true if expiry time is not set in the token
+  return true; // Return true if expiry time is not set in the to
+}
+
+Future<String> getAccessToken() async {
+  final accessToken = await getString("token", "access_token") ?? "";
+  if (isTokenExpired(accessToken)) {
+    final response = await APIService.shared.refreshAccessToken();
+    print("new token is ${response['access_token']}");
+    return response['access_token'];
+  }
+
+  return accessToken;
 }

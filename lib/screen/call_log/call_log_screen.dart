@@ -1,13 +1,18 @@
 // ignore_for_file: avoid_print
 
-import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hive/hive.dart';
 import 'package:secucalls/common/drawer.dart';
 import 'package:secucalls/constant/constants.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
+import 'package:secucalls/model/my_number_call_log_model.dart';
+import 'package:secucalls/model/spam_number.dart';
 import 'package:secucalls/screen/call_log/call_log_screen_def.dart';
+import 'package:secucalls/service/api_service.dart';
+import 'package:secucalls/utils/phone_number_update.dart';
 
 class CallLogScreen extends StatefulWidget {
   const CallLogScreen({super.key});
@@ -22,64 +27,79 @@ class _CallLogScreenState extends State<CallLogScreen>
   // List<String> missedCalls = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List<(String, String, TypeOfCall)> recentCalls = [];
+  List<MyNumberCallLog> recentCalls = [];
 
-  List<(String, String, TypeOfCall)> missedCalls = [];
+  List<MyNumberCallLog> missedCalls = [];
 
   late final TabController _tabController;
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    fetchDataFromServer(context);
     _getCallLogs();
   }
 
   void _getCallLogs() async {
-    // final Iterable<CallLogEntry> cLog = await CallLog.get();
-    // print('Queried call log entries');
-    // for (CallLogEntry entry in cLog) {
-    //   print('-------------------------------------');
-    //   print('F. NUMBER  : ${entry.formattedNumber}');
-    //   print('C.M. NUMBER: ${entry.cachedMatchedNumber}');
-    //   print('NUMBER     : ${entry.number}');
-    //   print('NAME       : ${entry.name}');
-    //   print('TYPE       : ${entry.callType}');
-    //   print('DURATION   : ${entry.duration}');
-    //   print('ACCOUNT ID : ${entry.phoneAccountId}');
-    //   print('ACCOUNT ID : ${entry.phoneAccountId}');
-    //   print('SIM NAME   : ${entry.simDisplayName}');
-    //   print('-------------------------------------');
-    //   late final TypeOfCall typeOfCall;
-    //   switch (entry.callType) {
-    //     case CallType.incoming:
-    //       typeOfCall = TypeOfCall.incoming;
-    //     case CallType.missed:
-    //       typeOfCall = TypeOfCall.missed;
-    //       setState(() {
-    //         missedCalls.add((
-    //           entry.number,
-    //           checkInfo(entry.cachedMatchedNumber),
-    //           typeOfCall
-    //         ) as (String, String, TypeOfCall));
-    //       });
+    final Iterable<CallLogEntry> cLog = await CallLog.get();
+    if (!Hive.isBoxOpen("recent_calls")) {
+      await Hive.openBox("recent_calls");
+    }
 
-    //     case CallType.outgoing:
-    //       typeOfCall = TypeOfCall.outgoing;
-    //     default:
-    //       typeOfCall = TypeOfCall.outgoing;
-    //   }
-    //   setState(() {
-    //     recentCalls.add((
-    //       entry.number,
-    //       checkInfo(entry.cachedMatchedNumber),
-    //       typeOfCall
-    //     ) as (String, String, TypeOfCall));
-    //   });
-    // }
+    final Box box = Hive.box("recent_calls");
+    await box.clear();
+
+    for (CallLogEntry entry in cLog) {
+      print('-------------------------------------');
+      print('F. NUMBER  : ${entry.formattedNumber}');
+      print('C.M. NUMBER: ${entry.cachedMatchedNumber}');
+      print('NUMBER     : ${entry.number}');
+      print('NAME       : ${entry.name}');
+      print('TYPE       : ${entry.callType}');
+      print('DURATION   : ${entry.duration}');
+      print('ACCOUNT ID : ${entry.phoneAccountId}');
+      print('ACCOUNT ID : ${entry.phoneAccountId}');
+      print('SIM NAME   : ${entry.simDisplayName}');
+      print('-------------------------------------');
+      late final TypeOfCall typeOfCall;
+      switch (entry.callType) {
+        case CallType.incoming:
+          typeOfCall = TypeOfCall.incoming;
+        case CallType.missed:
+          typeOfCall = TypeOfCall.missed;
+          final String? name = (entry.name != null)
+              ? entry.name
+              : await checkInfo(entry.formattedNumber ?? "");
+          setState(() {
+            missedCalls
+                .add(MyNumberCallLog(entry.number ?? "", typeOfCall, name!));
+          });
+        case CallType.outgoing:
+          typeOfCall = TypeOfCall.outgoing;
+        default:
+          typeOfCall = TypeOfCall.outgoing;
+      }
+      final String? name = (entry.name != null)
+          ? entry.name
+          : await checkInfo(entry.formattedNumber ?? "");
+      setState(() {
+        recentCalls.add(MyNumberCallLog(entry.number ?? "", typeOfCall, name!));
+      });
+    }
   }
 
-  String checkInfo(String? number) {
-    return "Spam : Sale bat dong san";
+  Future<String> checkInfo(String number) async {
+    if (!Hive.isBoxOpen("data_from_server")) {
+      await Hive.openBox("data_from_server");
+    }
+    final Box box = Hive.box("data_from_server");
+
+    final categoryOfNumber = await box.get(number);
+    if (categoryOfNumber != null) {
+      final spamName = categoryOfNumber["category"].join(', ');
+      return spamName;
+    }
+    return "";
   }
 
   void tapOnForgetPasswordButton() {
@@ -180,7 +200,7 @@ class CustomListView extends StatelessWidget {
     required this.listInfo,
   });
 
-  final List<(String, String, TypeOfCall)> listInfo;
+  final List<MyNumberCallLog> listInfo;
 
   IconData iconDataForCallType(TypeOfCall type) {
     switch (type) {
@@ -217,12 +237,12 @@ class CustomListView extends StatelessWidget {
                 ),
                 child: ListTile(
                   title: Text(
-                    listInfo[index].$1,
+                    listInfo[index].cachedMatchedNumber,
                     style: textBlack18,
                   ),
-                  leading: Icon(iconDataForCallType(listInfo[index].$3)),
+                  leading: Icon(iconDataForCallType(listInfo[index].callType)),
                   subtitle: Text(
-                    listInfo[index].$2,
+                    listInfo[index].name,
                     style: textGray15Italic,
                   ),
                   onTap: () {

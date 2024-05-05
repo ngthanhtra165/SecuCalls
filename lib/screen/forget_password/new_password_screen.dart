@@ -4,7 +4,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:secucalls/common/appbar.dart';
 import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
@@ -12,7 +11,9 @@ import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/forget_password/forget_password_def.dart';
 import 'package:secucalls/service/api_service.dart';
 import 'package:secucalls/service/hive.dart';
-import 'package:secucalls/service/overlay_manager.dart';
+import 'package:secucalls/utils/overlay_manager.dart';
+import 'package:secucalls/utils/common_function.dart';
+import 'package:secucalls/utils/token.dart';
 import 'package:secucalls/utils/validate.dart';
 
 class NewPasswordScreen extends StatefulWidget {
@@ -33,13 +34,9 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     super.initState();
   }
 
-  void tapOnBackButton() {
-    FocusScope.of(context).unfocus();
-    Navigator.of(context).pop();
-  }
-
   void tapOnRegisterButton() {
     log('move to register');
+    FocusScope.of(context).unfocus();
     Navigator.of(context).pushNamed('/Register');
   }
 
@@ -54,32 +51,35 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
       try {
         final password = passwordController.text;
         final confirmPassword = confirmPasswordController.text;
-        final otp_token = await getString("otp_token", "otp_token");
-        OverlayIndicatorManager.show(context);
-        
-        await Future.delayed(const Duration(seconds: 1), () async {
+        final otpToken = await getString("otp_token", "otp_token") ?? "";
 
-          final response = await APIService.shared.setPassword(
-            otp_token,
+        if (isTokenExpired(otpToken)) {
+          Navigator.of(context).pop();
+          Navigator.of(context).pushReplacementNamed('/OTPValidation');
+          showSnackBar(context, text_token_expired, 5);
+          final email = await getString("email", "email") ?? "";
+          await APIService.shared.forgetPassword(email);
+          return;
+        }
+
+        OverlayIndicatorManager.show(context);
+        await Future.delayed(const Duration(seconds: 1), () async {
+          await APIService.shared.setPassword(
+            otpToken,
             password,
             confirmPassword,
           );
-          //clearBox("token_otp");
+          await clearBox("token_otp");
+          await clearBox("email");
           OverlayIndicatorManager.hide();
           Navigator.pushNamedAndRemoveUntil(
               context, '/Login', (route) => false);
+          showSnackBar(context, text_change_password_success, 2);
         });
       } catch (e) {
         OverlayIndicatorManager.hide();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              e.toString(),
-            ),
-          ),
-        );
+        showSnackBar(context, e.toString(), 4);
       }
-      //Navigator.of(context).pushNamed('/');
       return;
     }
   }
@@ -92,10 +92,14 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
         child: Scaffold(
           // You can design your splash screen UI here
           resizeToAvoidBottomInset: false,
-          appBar: CustomAppBar(
-            icon: Icons.arrow_back_ios_rounded,
-            title: title_appbar,
-            onPressed: tapOnBackButton,
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            centerTitle: true,
+            title: const Text(
+              title_appbar,
+              textAlign: TextAlign.center,
+              style: textBlack21Italic,
+            ),
           ),
           body: Column(
             mainAxisAlignment: MainAxisAlignment.start,

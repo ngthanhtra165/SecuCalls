@@ -10,7 +10,6 @@ import 'package:secucalls/screen/overlay/overlay.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:secucalls/utils/flutter_background_service_utils.dart';
-
 import 'screen/splash/splash_screen.dart';
 
 void main() async {
@@ -22,7 +21,7 @@ void main() async {
   ]);
   final appDocumentDirectory = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentDirectory.path);
-
+  
   runApp(const MyApp());
 }
 

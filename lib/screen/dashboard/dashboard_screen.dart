@@ -1,4 +1,4 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers
+// ignore_for_file: no_leading_underscores_for_local_identifiers, use_build_context_synchronously
 
 import 'dart:developer';
 
@@ -11,6 +11,7 @@ import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/dashboard/dashboard_screen_def.dart';
 import 'package:secucalls/service/api_service.dart';
 import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/utils/common_function.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -32,7 +33,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void tapOnForgetPasswordButton() {
-    print('move to forget password');
     Navigator.of(context).pushNamed('/ForgetPassword');
     _scaffoldKey.currentState?.openEndDrawer();
   }
@@ -40,18 +40,12 @@ class _DashboardScreenState extends State<DashboardScreen>
   void tapOnLogOutButton() async {
     log('move to log out');
     try {
-      final response = await APIService.shared.logoutUser();
+      await APIService.shared.logoutUser();
       clearBox("token");
       clearBox("otp_token");
       Navigator.pushNamedAndRemoveUntil(context, '/Login', (route) => false);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
-        ),
-      );
+      showSnackBar(context, e.toString(), 4);
     }
   }
 

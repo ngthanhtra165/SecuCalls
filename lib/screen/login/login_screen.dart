@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:call_log/call_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,7 +15,9 @@ import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/login/login_screen_def.dart';
 import 'package:secucalls/service/api_service.dart';
 import 'package:secucalls/service/hive.dart';
-import 'package:secucalls/service/overlay_manager.dart';
+import 'package:secucalls/utils/overlay_manager.dart';
+import 'package:secucalls/utils/common_function.dart';
+import 'package:secucalls/utils/phone_number_update.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -34,32 +35,33 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     //_initMonitoringIncomingCall();
+    //updatePhoneContacts();
   }
 
-  void _initMonitoringIncomingCall() async {
-    final Iterable<CallLogEntry> cLog = await CallLog.get();
-    // save data into local
-    final status = await FlutterOverlayWindow.isPermissionGranted();
-    if (!status) {
-      await FlutterOverlayWindow.requestPermission();
-    }
-    final permission = await PhoneStateBackground.checkPermission();
-    if (permission) {
-      log("prepare ");
-      await PhoneStateBackground.initialize(
-          phoneStateBackgroundCallbackHandler);
-    } else {
-      log("prepare ");
-      await PhoneStateBackground.requestPermissions();
-      Timer.periodic(const Duration(seconds: 1), (timer) async {
-        final permission = await PhoneStateBackground.checkPermission();
-        if (permission) {
-          await PhoneStateBackground.initialize(
-              phoneStateBackgroundCallbackHandler);
-        }
-      });
-    }
-  }
+  // void _initMonitoringIncomingCall() async {
+  //   final Iterable<CallLogEntry> cLog = await CallLog.get();
+  //   // save data into local
+  //   final status = await FlutterOverlayWindow.isPermissionGranted();
+  //   if (!status) {
+  //     await FlutterOverlayWindow.requestPermission();
+  //   }
+  //   final permission = await PhoneStateBackground.checkPermission();
+  //   if (permission) {
+  //     log("prepare ");
+  //     await PhoneStateBackground.initialize(
+  //         phoneStateBackgroundCallbackHandler);
+  //   } else {
+  //     log("prepare ");
+  //     await PhoneStateBackground.requestPermissions();
+  //     Timer.periodic(const Duration(seconds: 1), (timer) async {
+  //       final permission = await PhoneStateBackground.checkPermission();
+  //       if (permission) {
+  //         await PhoneStateBackground.initialize(
+  //             phoneStateBackgroundCallbackHandler);
+  //       }
+  //     });
+  //   }
+  // }
 
   @pragma("vm:entry-point")
   Future<void> phoneStateBackgroundCallbackHandler(
@@ -113,13 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } catch (e) {
         OverlayIndicatorManager.hide();
         passwordController.clear();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              e.toString(),
-            ),
-          ),
-        );
+        showSnackBar(context, e.toString(), 4);
       }
     });
   }

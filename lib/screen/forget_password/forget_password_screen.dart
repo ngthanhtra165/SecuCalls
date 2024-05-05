@@ -12,7 +12,8 @@ import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/forget_password/forget_password_def.dart';
 import 'package:secucalls/service/api_service.dart';
 import 'package:secucalls/service/hive.dart';
-import 'package:secucalls/service/overlay_manager.dart';
+import 'package:secucalls/utils/overlay_manager.dart';
+import 'package:secucalls/utils/common_function.dart';
 import 'package:secucalls/utils/validate.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
@@ -32,6 +33,11 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void tapOnBackButton() {
     FocusScope.of(context).unfocus();
     Navigator.of(context).pop();
@@ -39,6 +45,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
   void tapOnRegisterButton() {
     log('move to register');
+    FocusScope.of(context).unfocus();
     Navigator.of(context).pushNamed('/Register');
   }
 
@@ -47,7 +54,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
 
-    if (isValid == false) {
+    if (isValid == true) {
       _formKey.currentState?.save();
 
       // wait server response
@@ -55,22 +62,16 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
         final email = emailController.text;
         OverlayIndicatorManager.show(context);
         await Future.delayed(const Duration(seconds: 1), () async {
-          final response = await APIService.shared.forgetPassword(email);
+          await APIService.shared.forgetPassword(email);
+          await addStringIntoBox("email", {"email": email});
           OverlayIndicatorManager.hide();
 
           Navigator.of(context).pushNamed('/OTPValidation');
         });
       } catch (e) {
         OverlayIndicatorManager.hide();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              e.toString(),
-            ),
-          ),
-        );
+        showSnackBar(context, e.toString(), 4);
       }
-
       return;
     }
   }

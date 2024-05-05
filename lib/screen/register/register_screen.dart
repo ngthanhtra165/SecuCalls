@@ -8,8 +8,8 @@ import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/screen/register/register_screen_def.dart';
 import 'package:secucalls/service/api_service.dart';
-import 'package:secucalls/service/hive.dart';
-import 'package:secucalls/service/overlay_manager.dart';
+import 'package:secucalls/utils/overlay_manager.dart';
+import 'package:secucalls/utils/common_function.dart';
 import 'package:secucalls/utils/validate.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -52,7 +52,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       OverlayIndicatorManager.show(context);
       try {
         await Future.delayed(const Duration(seconds: 1), () async {
-          final response = await APIService.shared
+          await APIService.shared
               .registerUser(firstName, lastName, email, phone, password);
           OverlayIndicatorManager.hide();
           Navigator.pushNamedAndRemoveUntil(
@@ -60,19 +60,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         });
       } catch (e) {
         OverlayIndicatorManager.hide();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              e.toString(),
-            ),
-          ),
-        );
+        showSnackBar(context, e.toString(), 4);
       }
     }
   }
 
   void tapOnForgetPasswordButton() {
     log('move to forget password');
+    FocusScope.of(context).unfocus();
     Navigator.of(context).pushNamed('/ForgetPassword');
   }
 

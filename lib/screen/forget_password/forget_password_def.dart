@@ -17,6 +17,11 @@ const String text_title_new_password = "Nhập lại mật khẩu mới";
 const double top_margin_form_new_password = 74;
 const String hint_text_new_password = "Mật khẩu mới";
 const double top_margin_register_button_new_password = 44;
+const String text_token_expired =
+    "OTP Token đã hết hiệu lực. OTP mới đã được gửi. Vui lòng nhập lại OTP";
+const String text_change_password_success =
+    "Đổi mật khẩu thành công. Vui lòng đăng nhập lại";
+const String text_otp_validate_success = "OTP hợp lệ";
 
 const double top_margin_title_text = 84;
 const double left_margin_title_text = 108;

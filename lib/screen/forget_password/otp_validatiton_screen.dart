@@ -12,8 +12,8 @@ import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/forget_password/forget_password_def.dart';
 import 'package:secucalls/service/api_service.dart';
 import 'package:secucalls/service/hive.dart';
-import 'package:secucalls/service/overlay_manager.dart';
-import 'package:secucalls/utils/token.dart';
+import 'package:secucalls/utils/overlay_manager.dart';
+import 'package:secucalls/utils/common_function.dart';
 import 'package:secucalls/utils/validate.dart';
 
 class OTPValidationScreen extends StatefulWidget {
@@ -35,10 +35,12 @@ class _OTPValidationScreenState extends State<OTPValidationScreen> {
   void tapOnBackButton() {
     FocusScope.of(context).unfocus();
     Navigator.of(context).pop();
+    //Navigator.of(context).pushReplacementNamed('/ForgetPassword');
   }
 
   void tapOnRegisterButton() {
     print('move to register');
+    FocusScope.of(context).unfocus();
     Navigator.of(context).pushNamed('/Register');
   }
 
@@ -47,8 +49,6 @@ class _OTPValidationScreenState extends State<OTPValidationScreen> {
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
     if (isValid == true) {
-      _formKey.currentState?.save();
-
       // wait server response
       try {
         final otp = otpController.text;
@@ -59,21 +59,16 @@ class _OTPValidationScreenState extends State<OTPValidationScreen> {
           () async {
             final response = await APIService.shared.otpValidation(otp);
             OverlayIndicatorManager.hide();
-            await clearBox("token_otp");
-            await addStringIntoBox("token_otp",
-                {"otp_token": extendTokenExpiry(response["otp_token"], 5)});
+            await addStringIntoBox("otp_token", {
+              "otp_token": response["otp_token"],
+            });
             Navigator.of(context).pushNamed('/NewPassword');
+            showSnackBar(context, text_otp_validate_success, 2);
           },
         );
       } catch (e) {
         OverlayIndicatorManager.hide();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              e.toString(),
-            ),
-          ),
-        );
+        showSnackBar(context, e.toString(), 4);
       }
 
       return;
