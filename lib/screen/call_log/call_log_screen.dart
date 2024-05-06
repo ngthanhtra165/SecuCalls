@@ -50,17 +50,6 @@ class _CallLogScreenState extends State<CallLogScreen>
     await box.clear();
 
     for (CallLogEntry entry in cLog) {
-      print('-------------------------------------');
-      print('F. NUMBER  : ${entry.formattedNumber}');
-      print('C.M. NUMBER: ${entry.cachedMatchedNumber}');
-      print('NUMBER     : ${entry.number}');
-      print('NAME       : ${entry.name}');
-      print('TYPE       : ${entry.callType}');
-      print('DURATION   : ${entry.duration}');
-      print('ACCOUNT ID : ${entry.phoneAccountId}');
-      print('ACCOUNT ID : ${entry.phoneAccountId}');
-      print('SIM NAME   : ${entry.simDisplayName}');
-      print('-------------------------------------');
       late final TypeOfCall typeOfCall;
       switch (entry.callType) {
         case CallType.incoming:
