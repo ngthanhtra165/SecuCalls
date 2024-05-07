@@ -6,7 +6,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:phone_state_background/phone_state_background.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/constants.dart';
@@ -15,10 +15,9 @@ import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/login/login_screen_def.dart';
 import 'package:secucalls/service/api_service.dart';
 import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/utils/flutter_background_service_utils.dart';
 import 'package:secucalls/utils/overlay_manager.dart';
 import 'package:secucalls/utils/common_function.dart';
-import 'package:secucalls/utils/phone_number_update.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -34,67 +33,17 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    //_initMonitoringIncomingCall();
+    _initMonitoringIncomingCall();
     //updatePhoneContacts();
   }
 
-  // void _initMonitoringIncomingCall() async {
-  //   final Iterable<CallLogEntry> cLog = await CallLog.get();
-  //   // save data into local
-  //   final status = await FlutterOverlayWindow.isPermissionGranted();
-  //   if (!status) {
-  //     await FlutterOverlayWindow.requestPermission();
-  //   }
-  //   final permission = await PhoneStateBackground.checkPermission();
-  //   if (permission) {
-  //     log("prepare ");
-  //     await PhoneStateBackground.initialize(
-  //         phoneStateBackgroundCallbackHandler);
-  //   } else {
-  //     log("prepare ");
-  //     await PhoneStateBackground.requestPermissions();
-  //     Timer.periodic(const Duration(seconds: 1), (timer) async {
-  //       final permission = await PhoneStateBackground.checkPermission();
-  //       if (permission) {
-  //         await PhoneStateBackground.initialize(
-  //             phoneStateBackgroundCallbackHandler);
-  //       }
-  //     });
-  //   }
-  // }
-
-  @pragma("vm:entry-point")
-  Future<void> phoneStateBackgroundCallbackHandler(
-    PhoneStateBackgroundEvent event,
-    String number,
-    int duration,
-  ) async {
-    log("is hehe $event");
-    switch (event) {
-      case PhoneStateBackgroundEvent.incomingstart:
-        log('Incoming call start, number: $number, duration: $duration s');
-        final SharedPreferences pref = await SharedPreferences.getInstance();
-        await pref.setString("number_call", number);
-        if (await FlutterOverlayWindow.isActive()) return;
-        log("show pop up");
-        await FlutterOverlayWindow.showOverlay();
-        break;
-      case PhoneStateBackgroundEvent.incomingmissed:
-        log('Incoming call missed, number: $number, duration: $duration s');
-        break;
-      case PhoneStateBackgroundEvent.incomingreceived:
-        log('Incoming call received, number: $number, duration: $duration s');
-        break;
-      case PhoneStateBackgroundEvent.incomingend:
-        log('Incoming call ended, number: $number, duration $duration s');
-        break;
-      case PhoneStateBackgroundEvent.outgoingstart:
-        log('Ougoing call start, number: $number, duration: $duration s');
-        break;
-      case PhoneStateBackgroundEvent.outgoingend:
-        log('Ougoing call ended, number: $number, duration: $duration s');
-        break;
+  void _initMonitoringIncomingCall() async {
+    //final Iterable<CallLogEntry> cLog = await CallLog.get();
+    final status = await FlutterOverlayWindow.isPermissionGranted();
+    if (!status) {
+      await FlutterOverlayWindow.requestPermission();
     }
+    await initializeService();
   }
 
   void tapOnLoginButton() async {

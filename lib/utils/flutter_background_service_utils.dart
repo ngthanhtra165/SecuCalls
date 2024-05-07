@@ -5,7 +5,21 @@ import 'dart:ui';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:phone_state/phone_state.dart';
 
+Future<bool> requestPermission() async {
+  var status = await Permission.phone.request();
+
+  return switch (status) {
+    PermissionStatus.denied ||
+    PermissionStatus.restricted ||
+    PermissionStatus.limited ||
+    PermissionStatus.permanentlyDenied =>
+      false,
+    PermissionStatus.provisional || PermissionStatus.granted => true,
+  };
+}
 
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
@@ -100,6 +114,16 @@ void onStart(ServiceInstance service) async {
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
+  print("hiihiiih");
+  bool temp = await requestPermission();
+  print("${temp}");
+  if (temp) {
+    print("1245 ${temp}");
+    PhoneState.stream.listen((event) {
+      print("1234");
+      print(event);
+    });
+  }
   // PhoneState.stream.listen((event) {
   //   print("Listen stream");
   //   print(event.status);

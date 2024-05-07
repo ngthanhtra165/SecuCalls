@@ -44,6 +44,7 @@ dependencies:
   jwt_decode: ^0.3.1
   contacts_service: ^0.6.3
   permission_handler: ^11.3.1
+  phone_state: ^1.0.4
 
 dev_dependencies:
   flutter_test:

@@ -12,6 +12,7 @@ import 'package:secucalls/screen/dashboard/dashboard_screen_def.dart';
 import 'package:secucalls/service/api_service.dart';
 import 'package:secucalls/service/hive.dart';
 import 'package:secucalls/utils/common_function.dart';
+import 'package:secucalls/utils/phone_number_update.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -28,6 +29,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     super.initState();
     number = "3.234.111";
     _tabController = TabController(length: 3, vsync: this);
+    fetchDataFromServer(context);
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
