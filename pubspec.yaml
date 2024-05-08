@@ -100,7 +100,7 @@ flutter:
   # maintain consistency when adding or modifying assets and plugins.
   # They also do not have any bearing on your native host application's
   # identifiers, which may be completely independent or the same as these.
-  module:
-    androidX: true
-    androidPackage: com.example.secucalls
-    iosBundleIdentifier: com.example.secucalls
+  # module:
+  #   androidX: true
+  #   androidPackage: com.example.secucalls
+  #   iosBundleIdentifier: com.example.secucalls

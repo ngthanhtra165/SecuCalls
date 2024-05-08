@@ -2,7 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:phone_state/phone_state.dart';
+import 'package:phone_state_background/phone_state_background.dart';
 
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/generate_route.dart';
@@ -13,31 +16,31 @@ import 'package:secucalls/utils/flutter_background_service_utils.dart';
 import 'screen/splash/splash_screen.dart';
 
 void main() async {
-  //RonStart();
   WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
   final appDocumentDirectory = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentDirectory.path);
-  
   runApp(const MyApp());
 }
 
-onStart() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  DartPluginRegistrant.ensureInitialized();
-  await initializeService();
-}
+// void onStart() async {
+//   await initializeService();
+// }
 
 @pragma("vm:entry-point")
 void overlayMain() async {
-  debugPrint("Starting Alerting Window Isolate!");
   WidgetsFlutterBinding.ensureInitialized();
+  print("Starting Alerting Window Isolate!");
 
-  runApp(const MaterialApp(
-      debugShowCheckedModeBanner: false, home: TrueCallerOverlay()));
+  runApp(const ScreenUtilInit(
+    designSize: fullScreenPortraitSize,
+    child: MaterialApp(
+        debugShowCheckedModeBanner: false, home: TrueCallerOverlay()),
+  ));
 }
 
 class MyApp extends StatefulWidget {

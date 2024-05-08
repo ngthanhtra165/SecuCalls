@@ -1,16 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-
+import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:phone_state/phone_state.dart';
 
 Future<bool> requestPermission() async {
   var status = await Permission.phone.request();
-
+  print("status is ${status}");
   return switch (status) {
     PermissionStatus.denied ||
     PermissionStatus.restricted ||
@@ -75,14 +76,12 @@ Future<void> initializeService() async {
       onBackground: onIosBackground,
     ),
   );
-  service.startService();
 }
-
-// to ensure this is executed
-// run app from xcode, then from xcode menu, select Simulate Background Fetch
 
 @pragma('vm:entry-point')
 Future<bool> onIosBackground(ServiceInstance service) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
   return true;
 }
 
@@ -90,12 +89,6 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 void onStart(ServiceInstance service) async {
   // Only available for flutter 3.0.0 and later
   DartPluginRegistrant.ensureInitialized();
-  print("onStart [TEST]");
-  // For flutter prior to version 3.0.0
-  // We have to register the plugin manually
-
-  // SharedPreferences preferences = await SharedPreferences.getInstance();
-  // await preferences.setString("hello", "world");
 
   /// OPTIONAL when use custom notification
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -114,72 +107,34 @@ void onStart(ServiceInstance service) async {
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
-  print("hiihiiih");
+
+  final status = await FlutterOverlayWindow.isPermissionGranted();
+  if (!status) {
+    await FlutterOverlayWindow.requestPermission();
+  }
   bool temp = await requestPermission();
-  print("${temp}");
   if (temp) {
-    print("1245 ${temp}");
-    PhoneState.stream.listen((event) {
-      print("1234");
-      print(event);
+    PhoneState.stream.listen((event) async {
+      //PhoneState status = PhoneState.nothing();
+      switch (event.status) {
+        case PhoneStateStatus.CALL_INCOMING:
+          print("show pop up incoming");
+          await FlutterOverlayWindow.showOverlay(
+            enableDrag: true,
+            overlayTitle: "X-SLAYER",
+            overlayContent: 'Overlay Enabled',
+            flag: OverlayFlag.defaultFlag,
+          );
+        case PhoneStateStatus.NOTHING:
+          print("show nothing");
+          await FlutterOverlayWindow.closeOverlay();
+        case PhoneStateStatus.CALL_ENDED:
+          print("show call end");
+          await FlutterOverlayWindow.closeOverlay();
+        case PhoneStateStatus.CALL_STARTED:
+          print("show start call");
+          await FlutterOverlayWindow.closeOverlay();
+      }
     });
   }
-  // PhoneState.stream.listen((event) {
-  //   print("Listen stream");
-  //   print(event.status);
-  //   print(event.number);
-  // });
-  // print("Start Stream");
-  // final permission = await PhoneStateBackground.checkPermission();
-  // await PhoneStateBackground.initialize(phoneStateBackgroundCallbackHandler);
-  // if (permission == true) {
-  //   //await PhoneStateBackground.initialize(phoneStateBackgroundCallbackHandler);
-  // } else {
-  //   print("false");
-  //   await PhoneStateBackground.requestPermissions();
-  //   final permission = await PhoneStateBackground.checkPermission();
-  // }
 }
-
-  // bring to foreground
-  // Timer.periodic(const Duration(seconds: 1), (timer) async {
-  //   //print("onStart [TEST] 1 2 3....");
-  //   if (service is AndroidServiceInstance) {
-  //     print(service);
-  //     if (await service.isForegroundService()) {
-  //       /// OPTIONAL for use custom notification
-  //       /// the notification id must be equals with AndroidConfiguration when you call configure() method.
-  //       flutterLocalNotificationsPlugin.show(
-  //         888,
-  //         'COOL SERVICE',
-  //         'Awesome ${DateTime.now()}',
-  //         const NotificationDetails(
-  //           android: AndroidNotificationDetails(
-  //             'my_foreground',
-  //             'MY FOREGROUND SERVICE',
-  //             icon: 'ic_bg_service_small',
-  //             ongoing: true,
-  //           ),
-  //         ),
-  //       );
-
-  //       // if you don't using custom notification, uncomment this
-  //       // service.setForegroundNotificationInfo(
-  //       //   title: "My App Service",
-  //       //   content: "Updated at ${DateTime.now()}",
-  //       // );
-  //     }
-  //   }
-    
-  //   // service.invoke(
-  //   //   'update',
-  //   //   {
-  //   //     "current_date": DateTime.now().toIso8601String(),
-  //   //     "device": device,
-  //   //   },
-  //   // );
-  // });
-
-
-
-

@@ -2,7 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:secucalls/constant/design_size.dart';
 
 class TrueCallerOverlay extends StatefulWidget {
   const TrueCallerOverlay({Key? key}) : super(key: key);
@@ -13,7 +14,6 @@ class TrueCallerOverlay extends StatefulWidget {
 
 class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
   bool isGold = true;
-  
 
   final _silverColors = const [
     Color(0xFFAEB2B8),
@@ -25,87 +25,59 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
   @override
   void initState() {
     super.initState();
-    // call api //
-    _getNumberOfIncomingCall();
-  }
-
-  String number = "";
-  void _getNumberOfIncomingCall() async {
-    final SharedPreferences pref = await SharedPreferences.getInstance();
-    final int? counter = pref.getInt('number_call');
-    log("number call is $counter");
-    setState(() {
-      if (counter != null) {
-      number = counter as String;
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12.0),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: _silverColors,
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: _silverColors,
+              ),
+              borderRadius: BorderRadius.circular(12.0),
             ),
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                isGold = !isGold;
-              });
-              FlutterOverlayWindow.getOverlayPosition().then((value) {
-                log("Overlay Position: $value");
-              });
-            },
             child: Stack(
               children: [
                 Column(
                   children: [
                     ListTile(
                       leading: Container(
-                        height: 80.0,
-                        width: 80.0,
+                        height: 40.0,
+                        width: 40.0,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black54),
                           shape: BoxShape.circle,
                         ),
-                        child: Image.asset(
-                          alignment: Alignment.bottomCenter,
-                          "lib/assets/logo.png",
-                        ),
                       ),
                       title: const Text(
-                        "Thanh Tra",
+                        "X-SLAYER",
                         style: TextStyle(
                             fontSize: 20.0, fontWeight: FontWeight.bold),
                       ),
-                      subtitle: const Text("Ha Tinh , Viet Nam"),
+                      subtitle: const Text("Sousse , Tunisia"),
                     ),
-                    const Spacer(),
                     const Divider(color: Colors.black54),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(number),
-                              const Text("Last call - 1 min ago"),
+                              Text("+216 21065826"),
+                              Text("Last call - 1 min ago"),
                             ],
                           ),
-                          const Text(
-                            "SecuCalls",
+                          Text(
+                            "Flutter Overlay",
                             style: TextStyle(
                                 fontSize: 15.0, fontWeight: FontWeight.bold),
                           ),

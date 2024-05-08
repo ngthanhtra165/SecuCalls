@@ -4,9 +4,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/constants.dart';
@@ -30,20 +29,29 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  static const platform = MethodChannel('samples.flutter.dev/battery');
   @override
   void initState() {
     super.initState();
-    _initMonitoringIncomingCall();
+    requestPermission();
+    //_initMonitoringIncomingCall();
     //updatePhoneContacts();
   }
 
-  void _initMonitoringIncomingCall() async {
-    //final Iterable<CallLogEntry> cLog = await CallLog.get();
-    final status = await FlutterOverlayWindow.isPermissionGranted();
-    if (!status) {
-      await FlutterOverlayWindow.requestPermission();
+  String _batteryLevel = 'Unknown battery level.';
+
+  Future<void> _getBatteryLevel() async {
+    String batteryLevel;
+    try {
+      final result = await platform.invokeMethod<int>('getBatteryLevel');
+      batteryLevel = 'Battery level at $result % .';
+    } on PlatformException catch (e) {
+      batteryLevel = "Failed to get battery level: '${e.message}'.";
     }
-    await initializeService();
+
+    setState(() {
+      _batteryLevel = batteryLevel;
+    });
   }
 
   void tapOnLoginButton() async {
@@ -71,7 +79,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void tapOnRegisterButton() async {
     log('move to register');
-    Navigator.of(context).pushNamed('/Register');
+    _getBatteryLevel();
+    //Navigator.of(context).pushNamed('/Register');
   }
 
   void tapOnForgetPasswordButton() async {
@@ -99,6 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: top_margin_logo.h,
                   ),
                   const LogoAndCompanyName(),
+                  Text(_batteryLevel, style: textGray21Italic,),
                   SizedBox(
                     height: top_margin_form.h,
                   ),
