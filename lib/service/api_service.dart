@@ -19,7 +19,7 @@ class APIService {
       body: jsonEncode(
         {
           'phone': "0345827894",
-          'password': "Tra1605@gmail",
+          'password': "Tra1@gmail",
         },
       ),
     );
@@ -202,6 +202,30 @@ class APIService {
         'Authorization': 'Bearer $accessToken',
       },
     );
+    final Map<String, dynamic> responseData = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON response
+      return responseData;
+    } else {
+      // If the server returns an error response, throw an exception
+      throw responseData["msg"];
+    }
+  }
+
+  Future<Map<String, dynamic>> changePassword(
+      String oldPassword, String newPassword) async {
+    const String apiUrl =
+        '$baseURL/user/change-password'; // Replace '/login' with your API endpoint
+    final accessToken = await getAccessToken();
+    print("access token is $accessToken");
+    final response = await http.post(Uri.parse(apiUrl),
+        headers: <String, String>{
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(
+            {"old_password": oldPassword, "new_password": newPassword}));
     final Map<String, dynamic> responseData = json.decode(response.body);
 
     if (response.statusCode == 200) {

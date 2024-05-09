@@ -36,16 +36,17 @@ import 'package:hive/hive.dart';
 import 'package:secucalls/service/api_service.dart';
 import 'package:secucalls/utils/common_function.dart';
 
-void fetchDataFromServer(BuildContext context) async {
+Future<void> fetchDataFromServer(BuildContext context) async {
   try {
     final response = await APIService.shared.fetchData();
-
+    print("fetch data xong");
     if (!Hive.isBoxOpen("data_from_server")) {
       await Hive.openBox("data_from_server");
     }
 
     final Box box = Hive.box("data_from_server");
     await box.clear();
+    print("clear box");
     for (var call in response["data"]) {
       final List<String> category = (call['category'] == null)
           ? []
@@ -55,21 +56,22 @@ void fetchDataFromServer(BuildContext context) async {
           ? []
           : convertListDynamicToListString(call['description']);
 
-      await box.put(call['phone_number'].toString(), {
+      box.put(call['phone_number'].toString(), {
         "category": category,
         "description": description,
         "phone_number": call["phone_number"].toString(),
         "type": call["type"].toString(),
       });
     }
-    await box.put("0345827894", {
+    print("list count is ${response["data"].length}");
+    box.put("0345827894", {
       "category": ["Lua dao cua dai hoc fpt"],
       "description": [""],
       "phone_number": "0345827894",
       "type": "null",
     });
   } catch (e) {
-    showSnackBar(context, e.toString(), 6);
+    showSnackBar(context, e.toString(), 5);
   }
 }
 

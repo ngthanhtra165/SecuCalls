@@ -17,6 +17,7 @@ import 'package:secucalls/service/hive.dart';
 import 'package:secucalls/utils/flutter_background_service_utils.dart';
 import 'package:secucalls/utils/overlay_manager.dart';
 import 'package:secucalls/utils/common_function.dart';
+import 'package:secucalls/utils/phone_number_update.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -38,22 +39,6 @@ class _LoginScreenState extends State<LoginScreen> {
     //updatePhoneContacts();
   }
 
-  String _batteryLevel = 'Unknown battery level.';
-
-  Future<void> _getBatteryLevel() async {
-    String batteryLevel;
-    try {
-      final result = await platform.invokeMethod<int>('getBatteryLevel');
-      batteryLevel = 'Battery level at $result % .';
-    } on PlatformException catch (e) {
-      batteryLevel = "Failed to get battery level: '${e.message}'.";
-    }
-
-    setState(() {
-      _batteryLevel = batteryLevel;
-    });
-  }
-
   void tapOnLoginButton() async {
     FocusScope.of(context).unfocus();
     final phone = phoneController.text;
@@ -63,12 +48,13 @@ class _LoginScreenState extends State<LoginScreen> {
     await Future.delayed(const Duration(seconds: 1), () async {
       try {
         final response = await APIService.shared.loginUser(phone, pass);
-        Navigator.of(context).pushNamed('/Dashboard');
-        OverlayIndicatorManager.hide();
-        addStringIntoBox("token", {
+        await addStringIntoBox("token", {
           "access_token": response["access_token"],
           "refresh_token": response["refresh_token"],
         });
+        await fetchDataFromServer(context);
+        Navigator.of(context).pushNamed('/Dashboard');
+        OverlayIndicatorManager.hide();
       } catch (e) {
         OverlayIndicatorManager.hide();
         passwordController.clear();
@@ -79,8 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void tapOnRegisterButton() async {
     log('move to register');
-    _getBatteryLevel();
-    //Navigator.of(context).pushNamed('/Register');
+    Navigator.of(context).pushNamed('/Register');
   }
 
   void tapOnForgetPasswordButton() async {
@@ -108,7 +93,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: top_margin_logo.h,
                   ),
                   const LogoAndCompanyName(),
-                  Text(_batteryLevel, style: textGray21Italic,),
                   SizedBox(
                     height: top_margin_form.h,
                   ),

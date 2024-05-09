@@ -44,7 +44,7 @@ class _OTPValidationScreenState extends State<OTPValidationScreen> {
     Navigator.of(context).pushNamed('/Register');
   }
 
-  void tapOnOTPValidationButton() async {
+  void tapOnSubmitButton() async {
     log('move to forget password');
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
@@ -100,7 +100,7 @@ class _OTPValidationScreenState extends State<OTPValidationScreen> {
               ),
               CustomForm(
                 controller: otpController,
-                onPressed: tapOnOTPValidationButton,
+                onPressed: tapOnSubmitButton,
                 formKey: _formKey,
               ),
               SizedBox(

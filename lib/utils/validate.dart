@@ -1,30 +1,30 @@
 String? validatePassword(String? password) {
   if (password == null || password.trim() == "") {
-    return "Empty password!";
+    return "Vui lòng nhập mật khẩu!";
   }
 
   if (password.length < 8) {
-    return "Password must contain more than 8 characters";
+    return "Mật khẩu phải có nhiều hơn 7 ký tự";
   }
 
   if (password.length > 16) {
-    return "Password must contain less than 16 characters";
+    return "Mật khẩu phải có ít hơn 17 ký tự";
   }
 
   if (!password.contains(RegExp(r'[A-Z]'))) {
-    return "Password must has uppercase";
+    return "Mật khẩu phải bao gồm kí tự in hoa";
   }
 
   if (!password.contains(RegExp(r'[0-9]'))) {
-    return "Password must has digits";
+    return "Mật khẩu phải bao gồm kí tự số";
   }
 
   if (!password.contains(RegExp(r'[a-z]'))) {
-    return "Password must has lowercase";
+    return "Mật khẩu phải bao gồm kí tự in thường";
   }
 
   if (!password.contains(RegExp(r'[#?!@$%^&*-]'))) {
-    return "Password must has special characters";
+    return "Mật khẩu phải bao gồm kí tự đặc biệt";
   } else {
     return null;
   }
@@ -32,7 +32,7 @@ String? validatePassword(String? password) {
 
 String? validatePhoneNumber(String? phone) {
   if (phone == null || phone.trim() == "") {
-    return "Empty phone!";
+    return "Vui lòng nhập số điện thoại!";
   }
 
   RegExp phoneRegExp = RegExp(
@@ -42,13 +42,13 @@ String? validatePhoneNumber(String? phone) {
   if (phoneRegExp.hasMatch(phone)) {
     return null;
   } else {
-    return "Invalid phone!";
+    return "Số điện thoại không hợp lệ!";
   }
 }
 
 String? validateName(String? name) {
   if (name == null || name.trim() == "") {
-    return "Empty name!";
+    return "Vui lòng nhập tên!";
   } else {
     return null;
   }
@@ -56,31 +56,49 @@ String? validateName(String? name) {
 
 String? validateEmail(String? email) {
   if (email == null || email.trim() == "") {
-    return "Empty email!";
+    return "Vui nhập lòng nhập email!";
   }
 
   String emailPattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
   RegExp regExp = RegExp(emailPattern);
-  return regExp.hasMatch(email) ? null : "Invalid email!";
+  return regExp.hasMatch(email) ? null : "Email không hợp lệ!";
 }
 
 String? validateOTP(String? otp) {
   if (otp == null || otp.trim() == "") {
-    return "Empty OTP!";
+    return "Vui lòng nhập mã OTP!";
   }
 
   String otpPattern = r'^\d{6}$';
   RegExp regExp = RegExp(otpPattern);
-  return regExp.hasMatch(otp) ? null : "Invalid OTP!";
+  return regExp.hasMatch(otp) ? null : "OTP không hợp lệ!";
 }
 
-String? validateSimilarPassword(String? password, String? inputtedPassword) {
+String? validateSimilarPassword(String? password, String? inputtedPassword,
+    {String? oldPassword}) {
   print('pass: $password, newpass: $inputtedPassword');
+  if (validatePassword(oldPassword) != null) {
+    return null;
+  }
+  if (validatePassword(inputtedPassword) != null) {
+    return null;
+  }
   if (password == null || password.trim() == "") {
-    return "Please re-enter your password";
+    return "Vui lòng nhập lại mật khẩu của bạn";
   }
   if (password != inputtedPassword) {
-    return 'Passwords do not match';
+    return 'Mật khẩu không khớp';
   }
   return null;
+}
+
+String? validateChangePassword(String? newPassword, String? oldPassword) {
+  if (validatePassword(oldPassword) != null) {
+    return null;
+  }
+  if (oldPassword == newPassword) {
+    return "Mật khẩu mới không được trùng với mật khẩu hiện tại";
+  }
+
+  return validatePassword(newPassword);
 }

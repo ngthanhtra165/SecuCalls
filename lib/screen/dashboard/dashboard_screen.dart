@@ -1,6 +1,5 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers, use_build_context_synchronously
 
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,10 +8,7 @@ import 'package:secucalls/common/radial_chart.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/dashboard/dashboard_screen_def.dart';
-import 'package:secucalls/service/api_service.dart';
-import 'package:secucalls/service/hive.dart';
-import 'package:secucalls/utils/common_function.dart';
-import 'package:secucalls/utils/phone_number_update.dart';
+import 'package:secucalls/utils/drawer.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -24,42 +20,29 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen>
     with TickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  
   @override
   void initState() {
     super.initState();
     number = "3.234.111";
     _tabController = TabController(length: 3, vsync: this);
-    fetchDataFromServer(context);
   }
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  void tapOnForgetPasswordButton() {
-    Navigator.of(context).pushNamed('/ForgetPassword');
-    _scaffoldKey.currentState?.openEndDrawer();
+  void tapOnChangePasswordButton() {
+    DrawerUtils.tapOnChangePasswordButton(context, _scaffoldKey);
   }
 
   void tapOnLogOutButton() async {
-    log('move to log out');
-    try {
-      await APIService.shared.logoutUser();
-      clearBox("token");
-      clearBox("otp_token");
-      Navigator.pushNamedAndRemoveUntil(context, '/Login', (route) => false);
-    } catch (e) {
-      showSnackBar(context, e.toString(), 4);
-    }
+    DrawerUtils.tapOnLogOutButton(context);
   }
 
   void tapOnHomeButton() {
-    log('home');
-    _scaffoldKey.currentState?.openEndDrawer();
+    DrawerUtils.tapOnSameButton(_scaffoldKey);
   }
 
   void tapOnCallLogButton() {
-    log('move to call log');
-    Navigator.of(context).pushNamed('/CallLog');
-    _scaffoldKey.currentState?.openEndDrawer();
+    DrawerUtils.tapOnCallLogButton(context, _scaffoldKey);
   }
 
   late String number;
@@ -73,7 +56,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         child: Scaffold(
           key: _scaffoldKey,
           drawer: CustomDrawer(
-            tapOnForgetPasswordButton: tapOnForgetPasswordButton,
+            tapOnChangePasswordButton: tapOnChangePasswordButton,
             tapOnHomeButton: tapOnHomeButton,
             tapOnLogOutButton: tapOnLogOutButton,
             tapOnCallLogButton: tapOnCallLogButton,

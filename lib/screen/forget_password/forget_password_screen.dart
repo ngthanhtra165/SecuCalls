@@ -49,7 +49,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     Navigator.of(context).pushNamed('/Register');
   }
 
-  void tapOnForgetPasswordButton() async {
+  void tapOnSubmitButton() async {
     log('move to forget password');
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
@@ -100,7 +100,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
               ),
               CustomForm(
                 controller: emailController,
-                onPressed: tapOnForgetPasswordButton,
+                onPressed: tapOnSubmitButton,
                 formKey: _formKey,
               ),
               SizedBox(

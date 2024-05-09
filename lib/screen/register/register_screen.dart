@@ -39,7 +39,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     Navigator.of(context).pop();
   }
 
-  void tapOnRegisterButton() async {
+  void tapOnSubmitButton() async {
     if (await FlutterOverlayWindow.isActive()) return;
     print("show pop up incoming");
     await FlutterOverlayWindow.showOverlay(
@@ -108,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   CustomForm(
-                    onPressed: tapOnRegisterButton,
+                    onPressed: tapOnSubmitButton,
                     form: _formKey,
                     firstNameController: firstNameController,
                     lastNameController: lastNameController,

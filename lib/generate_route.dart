@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:secucalls/screen/call_log/Call_Log_Screen.dart';
+import 'package:secucalls/screen/change_password/change_password.dart';
 import 'package:secucalls/screen/dashboard/dashboard_screen.dart';
 import 'package:secucalls/screen/forget_password/forget_password_screen.dart';
 import 'package:secucalls/screen/forget_password/new_password_screen.dart';
@@ -23,8 +24,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return _createRoute(const OTPValidationScreen());
     case "/NewPassword":
       return _createRoute(const NewPasswordScreen());
-          case "/CallLog":
+    case "/CallLog":
       return _createRoute(const CallLogScreen());
+    case "/ChangePassword":
+      return _createRoute(const ChangePasswordScreen());
     default:
       return _createRoute(const LoginScreen());
   }

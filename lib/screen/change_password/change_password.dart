@@ -5,39 +5,36 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/button.dart';
+import 'package:secucalls/common/drawer.dart';
 import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
-import 'package:secucalls/screen/forget_password/forget_password_def.dart';
+import 'package:secucalls/screen/change_password/change_password_def.dart';
 import 'package:secucalls/service/api_service.dart';
 import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/utils/drawer.dart';
 import 'package:secucalls/utils/overlay_manager.dart';
 import 'package:secucalls/utils/common_function.dart';
-import 'package:secucalls/utils/token.dart';
 import 'package:secucalls/utils/validate.dart';
 
-class NewPasswordScreen extends StatefulWidget {
-  const NewPasswordScreen({super.key});
+class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _NewPasswordScreenState createState() => _NewPasswordScreenState();
+  _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
 }
 
-class _NewPasswordScreenState extends State<NewPasswordScreen> {
+class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController passwordController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  TextEditingController oldPasswordController = TextEditingController();
+  TextEditingController newPasswordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-  }
-
-  void tapOnRegisterButton() {
-    log('move to register');
-    FocusScope.of(context).unfocus();
-    Navigator.of(context).pushNamed('/Register');
   }
 
   void tapOnSubmitButton() async {
@@ -49,28 +46,16 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
 
       // wait server response
       try {
-        final password = passwordController.text;
-        final confirmPassword = confirmPasswordController.text;
-        final otpToken = await getString("otp_token", "otp_token") ?? "";
-
-        if (isTokenExpired(otpToken)) {
-          Navigator.of(context).pop();
-          Navigator.of(context).pushReplacementNamed('/OTPValidation');
-          showSnackBar(context, text_token_expired, 5);
-          final email = await getString("email", "email") ?? "";
-          await APIService.shared.forgetPassword(email);
-          return;
-        }
+        final oldPassword = oldPasswordController.text;
+        final newPassword = newPasswordController.text;
 
         OverlayIndicatorManager.show(context);
         await Future.delayed(const Duration(seconds: 1), () async {
-          await APIService.shared.setPassword(
-            otpToken,
-            password,
-            confirmPassword,
+          await APIService.shared.changePassword(
+            oldPassword,
+            newPassword,
           );
-          await clearBox("token_otp");
-          await clearBox("email");
+          await clearBox("token");
           OverlayIndicatorManager.hide();
           Navigator.pushNamedAndRemoveUntil(
               context, '/Login', (route) => false);
@@ -84,6 +69,22 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     }
   }
 
+  void tapOnChangePasswordButton() async {
+    DrawerUtils.tapOnSameButton(_scaffoldKey);
+  }
+
+  void tapOnLogOutButton() async {
+    DrawerUtils.tapOnLogOutButton(context);
+  }
+
+  void tapOnHomeButton() {
+    DrawerUtils.tapOnHomeButton(context, _scaffoldKey);
+  }
+
+  void tapOnCallLogButton() {
+    DrawerUtils.tapOnCallLogButton(context, _scaffoldKey);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -92,8 +93,13 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
         child: Scaffold(
           // You can design your splash screen UI here
           resizeToAvoidBottomInset: false,
+          drawer: CustomDrawer(
+            tapOnChangePasswordButton: tapOnChangePasswordButton,
+            tapOnHomeButton: tapOnHomeButton,
+            tapOnLogOutButton: tapOnLogOutButton,
+            tapOnCallLogButton: tapOnCallLogButton,
+          ),
           appBar: AppBar(
-            automaticallyImplyLeading: false,
             centerTitle: true,
             title: const Text(
               title_appbar,
@@ -114,23 +120,10 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
               CustomForm(
                 onPressed: tapOnSubmitButton,
                 formKey: _formKey,
-                passwordController: passwordController,
+                oldPasswordController: oldPasswordController,
+                newPasswordController: newPasswordController,
                 confirmPasswordController: confirmPasswordController,
               ),
-              SizedBox(
-                height: top_margin_register_button_new_password.h,
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  left: left_margin_register_button.w,
-                  right: left_margin_register_button.w,
-                ),
-                child: CustomTextButton(
-                  text: text_register_button,
-                  onPressed: tapOnRegisterButton,
-                  textAlign: TextAlign.center,
-                ),
-              )
             ],
           ),
         ),
@@ -144,13 +137,15 @@ class CustomForm extends StatefulWidget {
     super.key,
     required this.onPressed,
     required this.formKey,
-    required this.passwordController,
+    required this.oldPasswordController,
+    required this.newPasswordController,
     required this.confirmPasswordController,
   });
 
   final VoidCallback onPressed;
   final GlobalKey<FormState> formKey;
-  final TextEditingController passwordController;
+  final TextEditingController oldPasswordController;
+  final TextEditingController newPasswordController;
   final TextEditingController confirmPasswordController;
   @override
   State<CustomForm> createState() => _CustomFormState();
@@ -171,8 +166,8 @@ class _CustomFormState extends State<CustomForm> {
           children: [
             CustomTextField(
               icon: null,
-              hintText: hint_text_new_password,
-              controller: widget.passwordController,
+              hintText: hint_text_old_password,
+              controller: widget.oldPasswordController,
               validator: (text) => validatePassword(text),
               isPassword: true,
             ),
@@ -181,10 +176,22 @@ class _CustomFormState extends State<CustomForm> {
             ),
             CustomTextField(
               icon: null,
-              hintText: text_title_new_password,
+              hintText: hint_text_new_password,
+              controller: widget.newPasswordController,
+              validator: (text) => validateChangePassword(
+                  text, widget.oldPasswordController.text),
+              isPassword: true,
+            ),
+            SizedBox(
+              height: space_between_form_button.h,
+            ),
+            CustomTextField(
+              icon: null,
+              hintText: hint_text_confirm_password,
               controller: widget.confirmPasswordController,
-              validator: (text) =>
-                  validateSimilarPassword(text, widget.passwordController.text),
+              validator: (text) => validateSimilarPassword(
+                  text, widget.newPasswordController.text,
+                  oldPassword: widget.oldPasswordController.text),
               isPassword: true,
             ),
             SizedBox(
@@ -216,7 +223,7 @@ class TextTitle extends StatelessWidget {
       child: const FittedBox(
         fit: BoxFit.scaleDown,
         child: Text(
-          text_title_new_password,
+          text_title,
           style: textGray21Italic,
         ),
       ),

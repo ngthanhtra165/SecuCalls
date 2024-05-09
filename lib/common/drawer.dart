@@ -6,12 +6,12 @@ import 'package:secucalls/screen/dashboard/dashboard_screen_def.dart';
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({
     super.key,
-    required this.tapOnForgetPasswordButton,
+    required this.tapOnChangePasswordButton,
     required this.tapOnHomeButton,
     required this.tapOnLogOutButton, 
     required this.tapOnCallLogButton,
   });
-  final VoidCallback tapOnForgetPasswordButton;
+  final VoidCallback tapOnChangePasswordButton;
   final VoidCallback tapOnHomeButton;
   final VoidCallback tapOnLogOutButton;
   final VoidCallback tapOnCallLogButton;
@@ -75,7 +75,7 @@ class CustomDrawer extends StatelessWidget {
                 CustomListTile(
                   title: title_drawer_item_2,
                   icon: Icons.account_box,
-                  onPress: tapOnForgetPasswordButton,
+                  onPress: tapOnChangePasswordButton,
                 ),
                 SizedBox(
                   height: 10.h,

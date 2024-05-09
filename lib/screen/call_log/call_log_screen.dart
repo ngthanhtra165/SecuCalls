@@ -9,9 +9,8 @@ import 'package:secucalls/constant/constants.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/model/my_number_call_log_model.dart';
-import 'package:secucalls/model/spam_number.dart';
 import 'package:secucalls/screen/call_log/call_log_screen_def.dart';
-import 'package:secucalls/service/api_service.dart';
+import 'package:secucalls/utils/drawer.dart';
 import 'package:secucalls/utils/phone_number_update.dart';
 
 class CallLogScreen extends StatefulWidget {
@@ -36,7 +35,6 @@ class _CallLogScreenState extends State<CallLogScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    fetchDataFromServer(context);
     _getCallLogs();
   }
 
@@ -84,6 +82,7 @@ class _CallLogScreenState extends State<CallLogScreen>
     final Box box = Hive.box("data_from_server");
 
     final categoryOfNumber = await box.get(number);
+  
     if (categoryOfNumber != null) {
       final spamName = categoryOfNumber["category"].join(', ');
       return spamName;
@@ -91,27 +90,20 @@ class _CallLogScreenState extends State<CallLogScreen>
     return "";
   }
 
-  void tapOnForgetPasswordButton() {
-    print('move to forget password');
-    Navigator.of(context).pushNamed('/ForgetPassword');
-    _scaffoldKey.currentState?.openEndDrawer();
+  void tapOnChangePasswordButton() {
+    DrawerUtils.tapOnChangePasswordButton(context, _scaffoldKey);
   }
 
-  void tapOnLogOutButton() {
-    print('move to log out');
-    Navigator.pushNamedAndRemoveUntil(context, '/Login', (route) => false);
+  void tapOnLogOutButton() async {
+    DrawerUtils.tapOnLogOutButton(context);
   }
 
   void tapOnHomeButton() {
-    print('home');
-    Navigator.of(context).pushNamed('/Dashboard');
-    _scaffoldKey.currentState?.openEndDrawer();
+    DrawerUtils.tapOnHomeButton(context, _scaffoldKey);
   }
 
   void tapOnCallLogButton() {
-    print('move to call log');
-    Navigator.of(context).pushNamed('/CallLog');
-    _scaffoldKey.currentState?.openEndDrawer();
+    DrawerUtils.tapOnSameButton(_scaffoldKey);
   }
 
   @override
@@ -123,7 +115,7 @@ class _CallLogScreenState extends State<CallLogScreen>
           resizeToAvoidBottomInset: false,
           key: _scaffoldKey,
           drawer: CustomDrawer(
-            tapOnForgetPasswordButton: tapOnForgetPasswordButton,
+            tapOnChangePasswordButton: tapOnChangePasswordButton,
             tapOnHomeButton: tapOnHomeButton,
             tapOnLogOutButton: tapOnLogOutButton,
             tapOnCallLogButton: tapOnCallLogButton,
