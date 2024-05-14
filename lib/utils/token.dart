@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:secucalls/service/hive.dart';
 import '../service/api_service.dart';

@@ -1,7 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/appbar.dart';
 import 'package:secucalls/common/button.dart';
@@ -40,20 +41,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void tapOnSubmitButton() async {
-    if (await FlutterOverlayWindow.isActive()) return;
-    print("show pop up incoming");
-    await FlutterOverlayWindow.showOverlay(
-      enableDrag: true,
-      overlayTitle: "X-SLAYER",
-      overlayContent: 'Overlay Enabled',
-      flag: OverlayFlag.defaultFlag,
-      visibility: NotificationVisibility.visibilityPublic,
-      positionGravity: PositionGravity.auto,
-      height: (MediaQuery.of(context).size.height * 0.6).toInt(),
-      width: WindowSize.matchParent,
-      startPosition: const OverlayPosition(0, -259),
-    );
-
     FocusScope.of(context).unfocus();
     final isValid = _formKey.currentState?.validate();
 

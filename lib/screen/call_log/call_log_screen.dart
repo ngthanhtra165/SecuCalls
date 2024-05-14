@@ -10,9 +10,9 @@ import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/model/my_number_call_log_model.dart';
 import 'package:secucalls/screen/call_log/call_log_screen_def.dart';
+import 'package:secucalls/utils/data_call.dart';
 import 'package:secucalls/utils/drawer.dart';
-import 'package:secucalls/utils/phone_number_update.dart';
-
+    
 class CallLogScreen extends StatefulWidget {
   const CallLogScreen({super.key});
 
@@ -22,8 +22,6 @@ class CallLogScreen extends StatefulWidget {
 
 class _CallLogScreenState extends State<CallLogScreen>
     with TickerProviderStateMixin {
-  // List<String> recentCalls = [];
-  // List<String> missedCalls = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<MyNumberCallLog> recentCalls = [];
@@ -56,7 +54,7 @@ class _CallLogScreenState extends State<CallLogScreen>
           typeOfCall = TypeOfCall.missed;
           final String? name = (entry.name != null)
               ? entry.name
-              : await checkInfo(entry.formattedNumber ?? "");
+              : await checkCallInfoInDatabase(entry.formattedNumber ?? "", false);
           setState(() {
             missedCalls
                 .add(MyNumberCallLog(entry.number ?? "", typeOfCall, name!));
@@ -68,26 +66,11 @@ class _CallLogScreenState extends State<CallLogScreen>
       }
       final String? name = (entry.name != null)
           ? entry.name
-          : await checkInfo(entry.formattedNumber ?? "");
+          : await checkCallInfoInDatabase(entry.formattedNumber ?? "", false);
       setState(() {
         recentCalls.add(MyNumberCallLog(entry.number ?? "", typeOfCall, name!));
       });
     }
-  }
-
-  Future<String> checkInfo(String number) async {
-    if (!Hive.isBoxOpen("data_from_server")) {
-      await Hive.openBox("data_from_server");
-    }
-    final Box box = Hive.box("data_from_server");
-
-    final categoryOfNumber = await box.get(number);
-  
-    if (categoryOfNumber != null) {
-      final spamName = categoryOfNumber["category"].join(', ');
-      return spamName;
-    }
-    return "";
   }
 
   void tapOnChangePasswordButton() {

@@ -1,10 +1,10 @@
-// ignore_for_file: use_build_context_synchronously, unused_local_variable, library_private_types_in_public_api
+// ignore_for_file: use_build_context_synchronously, unused_local_variable, library_private_types_in_public_api, avoid_print
 
 import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/text_field.dart';
@@ -17,7 +17,7 @@ import 'package:secucalls/service/hive.dart';
 import 'package:secucalls/utils/flutter_background_service_utils.dart';
 import 'package:secucalls/utils/overlay_manager.dart';
 import 'package:secucalls/utils/common_function.dart';
-import 'package:secucalls/utils/phone_number_update.dart';
+import 'package:secucalls/utils/data_call.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  static const platform = MethodChannel('samples.flutter.dev/battery');
+  //static const platform = MethodChannel('samples.flutter.dev/battery');
   @override
   void initState() {
     super.initState();
@@ -65,7 +65,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void tapOnRegisterButton() async {
     log('move to register');
-    Navigator.of(context).pushNamed('/Register');
+    print("show pop up incoming");
+    await FlutterOverlayWindow.showOverlay(
+      enableDrag: true,
+      overlayTitle: "X-SLAYER",
+      overlayContent: 'Overlay Enabled',
+      flag: OverlayFlag.defaultFlag,
+    );
+    // Navigator.of(context).pushNamed('/Register');
   }
 
   void tapOnForgetPasswordButton() async {

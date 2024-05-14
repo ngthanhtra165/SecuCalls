@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 String? validatePassword(String? password) {
   if (password == null || password.trim() == "") {
     return "Vui lòng nhập mật khẩu!";

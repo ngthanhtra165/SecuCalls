@@ -1,11 +1,12 @@
+// ignore_for_file: avoid_print
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:phone_state/phone_state.dart';
-import 'package:phone_state_background/phone_state_background.dart';
+
 
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/generate_route.dart';
@@ -24,12 +25,20 @@ void main() async {
   ]);
   final appDocumentDirectory = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentDirectory.path);
+  onStart();
   runApp(const MyApp());
 }
 
-// void onStart() async {
-//   await initializeService();
-// }
+void onStart() async {
+  final status = await FlutterOverlayWindow.isPermissionGranted();
+  if (!status) {
+    await FlutterOverlayWindow.requestPermission();
+  }
+  bool temp = await requestPermission();
+  if (temp) {
+    await initializeService();
+  }
+}
 
 @pragma("vm:entry-point")
 void overlayMain() async {

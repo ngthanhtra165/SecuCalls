@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:secucalls/constant/design_size.dart';
 
 class TrueCallerOverlay extends StatefulWidget {
   const TrueCallerOverlay({Key? key}) : super(key: key);
@@ -14,6 +11,7 @@ class TrueCallerOverlay extends StatefulWidget {
 
 class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
   bool isGold = true;
+  static const MethodChannel _channel = MethodChannel('call_handler');
 
   final _silverColors = const [
     Color(0xFFAEB2B8),
@@ -91,6 +89,11 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
                   right: 0,
                   child: IconButton(
                     onPressed: () async {
+                      try {
+                        await _channel.invokeMethod('acceptCall');
+                      } on PlatformException catch (e) {
+                        print("Failed to accept call: '${e.message}'.");
+                      }
                       await FlutterOverlayWindow.closeOverlay();
                     },
                     icon: const Icon(

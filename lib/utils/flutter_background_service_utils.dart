@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
@@ -8,10 +10,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:phone_state/phone_state.dart';
+import 'package:secucalls/utils/data_call.dart';
 
 Future<bool> requestPermission() async {
   var status = await Permission.phone.request();
-  print("status is ${status}");
   return switch (status) {
     PermissionStatus.denied ||
     PermissionStatus.restricted ||
@@ -90,10 +92,6 @@ void onStart(ServiceInstance service) async {
   // Only available for flutter 3.0.0 and later
   DartPluginRegistrant.ensureInitialized();
 
-  /// OPTIONAL when use custom notification
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
       service.setAsForegroundService();
@@ -107,34 +105,50 @@ void onStart(ServiceInstance service) async {
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
+  print("request permission for overlay, screen height is");
+  var state = false;
+  var showPopup = false;
+  Timer.periodic(const Duration(seconds: 1), (timer) async {
+    print("state is $state and $showPopup");
+    if (state == true && showPopup == false) {
+      showPopup = true;
+      if (await FlutterOverlayWindow.isActive()) return;
+      await FlutterOverlayWindow.showOverlay(
+        enableDrag: true,
+        overlayTitle: "X-SLAYER",
+        overlayContent: 'Overlay Enabled',
+        flag: OverlayFlag.defaultFlag,
+        height: WindowSize.matchParent,
+        positionGravity: PositionGravity.auto,
+        width: WindowSize.matchParent,
+        startPosition: const OverlayPosition(0, -259),
+      );
+    }
+    if (state == false) {
+      showPopup = false;
+      await FlutterOverlayWindow.closeOverlay();
+    }
+  });
 
-  final status = await FlutterOverlayWindow.isPermissionGranted();
-  if (!status) {
-    await FlutterOverlayWindow.requestPermission();
-  }
-  bool temp = await requestPermission();
-  if (temp) {
-    PhoneState.stream.listen((event) async {
-      //PhoneState status = PhoneState.nothing();
-      switch (event.status) {
-        case PhoneStateStatus.CALL_INCOMING:
-          print("show pop up incoming");
-          await FlutterOverlayWindow.showOverlay(
-            enableDrag: true,
-            overlayTitle: "X-SLAYER",
-            overlayContent: 'Overlay Enabled',
-            flag: OverlayFlag.defaultFlag,
-          );
-        case PhoneStateStatus.NOTHING:
-          print("show nothing");
-          await FlutterOverlayWindow.closeOverlay();
-        case PhoneStateStatus.CALL_ENDED:
-          print("show call end");
-          await FlutterOverlayWindow.closeOverlay();
-        case PhoneStateStatus.CALL_STARTED:
-          print("show start call");
-          await FlutterOverlayWindow.closeOverlay();
-      }
-    });
-  }
+  PhoneState.stream.listen((event) async {
+    //PhoneState status = PhoneState.nothing();
+    switch (event.status) {
+      case PhoneStateStatus.CALL_INCOMING:
+        print("show pop up incoming");
+        await getInformationFromCall(event.number);
+        state = true;
+      case PhoneStateStatus.NOTHING:
+        print("show nothing");
+        state = false;
+        await FlutterOverlayWindow.closeOverlay();
+      case PhoneStateStatus.CALL_ENDED:
+        state = false;
+        print("show call end");
+        await FlutterOverlayWindow.closeOverlay();
+      case PhoneStateStatus.CALL_STARTED:
+        state = false;
+        print("show start call");
+        await FlutterOverlayWindow.closeOverlay();
+    }
+  });
 }
