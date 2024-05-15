@@ -1,3 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/appbar.dart';
@@ -6,6 +10,11 @@ import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/forget_password/forget_password_def.dart';
+import 'package:secucalls/service/api_service.dart';
+import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/utils/overlay_manager.dart';
+import 'package:secucalls/utils/common_function.dart';
+import 'package:secucalls/utils/validate.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({super.key});
@@ -16,26 +25,56 @@ class ForgetPasswordScreen extends StatefulWidget {
 }
 
 class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController emailController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void tapOnBackButton() {
+    FocusScope.of(context).unfocus();
     Navigator.of(context).pop();
   }
 
   void tapOnRegisterButton() {
-    print('move to register');
+    log('move to register');
+    FocusScope.of(context).unfocus();
     Navigator.of(context).pushNamed('/Register');
   }
 
-  void tapOnForgetPasswordButton() {
-    print('move to forget password');
-    //Navigator.of(context).pushNamed('/ForgetPassword');
-  }
+  void tapOnSubmitButton() async {
+    log('move to forget password');
+    FocusScope.of(context).unfocus();
+    final isValid = _formKey.currentState?.validate();
 
-  final TextEditingController phoneController = TextEditingController();
+    if (isValid == true) {
+      _formKey.currentState?.save();
+
+      // wait server response
+      try {
+        final email = emailController.text;
+        OverlayIndicatorManager.show(context);
+        await Future.delayed(const Duration(seconds: 1), () async {
+          await APIService.shared.forgetPassword(email);
+          await addStringIntoBox("email", {"email": email});
+          OverlayIndicatorManager.hide();
+
+          Navigator.of(context).pushNamed('/OTPValidation');
+        });
+      } catch (e) {
+        OverlayIndicatorManager.hide();
+        showSnackBar(context, e.toString(), 4);
+      }
+      return;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +82,6 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       designSize: fullScreenPortraitSize,
       child: SafeArea(
         child: Scaffold(
-          // You can design your splash screen UI here
           resizeToAvoidBottomInset: false,
           appBar: CustomAppBar(
             icon: Icons.arrow_back_ios_rounded,
@@ -61,8 +99,9 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                 height: top_margin_form.h,
               ),
               CustomForm(
-                phoneController: phoneController,
-                onPressed: tapOnForgetPasswordButton,
+                controller: emailController,
+                onPressed: tapOnSubmitButton,
+                formKey: _formKey,
               ),
               SizedBox(
                 height: top_margin_register_button.h,
@@ -77,7 +116,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   onPressed: tapOnRegisterButton,
                   textAlign: TextAlign.center,
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -89,36 +128,41 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 class CustomForm extends StatelessWidget {
   const CustomForm({
     super.key,
-    required this.phoneController,
     required this.onPressed,
+    required this.formKey,
+    required this.controller,
   });
 
-  final TextEditingController phoneController;
   final VoidCallback onPressed;
-
+  final GlobalKey<FormState> formKey;
+  final TextEditingController controller;
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: left_margin_form.w,
-        right: left_margin_form.w,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          CustomTextField(
-            icon: Icons.phone,
-            hintText: hint_text_phone,
-            controller: phoneController,
-          ),
-          SizedBox(
-            height: space_between_form_button.h,
-          ),
-          CustomButton(
-            text: text_button,
-            onPressed: onPressed,
-          ),
-        ],
+    return Form(
+      key: formKey,
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: left_margin_form.w,
+          right: left_margin_form.w,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CustomTextField(
+              controller: controller,
+              icon: Icons.alternate_email,
+              hintText: hint_text_email,
+              validator: (text) => validateEmail(text),
+            ),
+            SizedBox(
+              height: space_between_form_button.h,
+            ),
+            CustomButton(
+              text: text_button,
+              onPressed: onPressed,
+            ),
+          ],
+        ),
       ),
     );
   }

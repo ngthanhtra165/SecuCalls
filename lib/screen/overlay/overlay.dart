@@ -1,6 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
 class TrueCallerOverlay extends StatefulWidget {
@@ -12,12 +11,7 @@ class TrueCallerOverlay extends StatefulWidget {
 
 class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
   bool isGold = true;
-  
-  final _goldColors = const [
-    Color(0xFFa2790d),
-    Color(0xFFebd197),
-    Color(0xFFa2790d),
-  ];
+  static const MethodChannel _channel = MethodChannel('call_handler');
 
   final _silverColors = const [
     Color(0xFFAEB2B8),
@@ -29,50 +23,35 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
   @override
   void initState() {
     super.initState();
-    // call api //
-
   }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12.0),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: _silverColors,
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: _silverColors,
+              ),
+              borderRadius: BorderRadius.circular(12.0),
             ),
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                isGold = !isGold;
-              });
-              FlutterOverlayWindow.getOverlayPosition().then((value) {
-                log("Overlay Position: $value");
-              });
-            },
             child: Stack(
               children: [
                 Column(
                   children: [
                     ListTile(
                       leading: Container(
-                        height: 80.0,
-                        width: 80.0,
+                        height: 40.0,
+                        width: 40.0,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black54),
                           shape: BoxShape.circle,
-                        ),
-                        child: Image.asset(
-                          alignment: Alignment.bottomCenter,
-                          "lib/assets/logo.png",
                         ),
                       ),
                       title: const Text(
@@ -82,7 +61,6 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
                       ),
                       subtitle: const Text("Sousse , Tunisia"),
                     ),
-                    const Spacer(),
                     const Divider(color: Colors.black54),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12.0),
@@ -111,6 +89,11 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
                   right: 0,
                   child: IconButton(
                     onPressed: () async {
+                      try {
+                        await _channel.invokeMethod('acceptCall');
+                      } on PlatformException catch (e) {
+                        print("Failed to accept call: '${e.message}'.");
+                      }
                       await FlutterOverlayWindow.closeOverlay();
                     },
                     icon: const Icon(

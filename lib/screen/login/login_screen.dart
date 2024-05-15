@@ -1,5 +1,9 @@
+// ignore_for_file: use_build_context_synchronously, unused_local_variable, library_private_types_in_public_api, avoid_print
+
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/text_field.dart';
@@ -7,12 +11,17 @@ import 'package:secucalls/constant/constants.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/login/login_screen_def.dart';
+import 'package:secucalls/service/api_service.dart';
+import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/utils/flutter_background_service_utils.dart';
+import 'package:secucalls/utils/overlay_manager.dart';
+import 'package:secucalls/utils/common_function.dart';
+import 'package:secucalls/utils/data_call.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoginScreenState createState() => _LoginScreenState();
 }
 
@@ -23,70 +32,78 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    requestPermission();
+    //_initMonitoringIncomingCall();
+    //updatePhoneContacts();
   }
 
   void tapOnLoginButton() async {
-    var name = phoneController.text;
-    var email = passwordController.text;
-    // Do something with the entered data
-    print('Name: $name, Email: $email');
-    // Navigator.of(context).pushNamed('/Dashboard');
-    FlutterOverlayWindow.closeOverlay()
-        .then((value) => print('STOPPED: alue: $value'));
+    FocusScope.of(context).unfocus();
+    final phone = phoneController.text;
+    final pass = passwordController.text;
+    log('Name: $phone, Email: $pass');
+    OverlayIndicatorManager.show(context);
+      try {
+        final response = await APIService.shared.loginUser(phone, pass);
+        await addStringIntoBox("token", {
+          "access_token": response["access_token"],
+          "refresh_token": response["refresh_token"],
+        });
+        await fetchDataFromServer(context);
+        Navigator.of(context).pushNamed('/Dashboard');
+        OverlayIndicatorManager.hide();
+      } catch (e) {
+        OverlayIndicatorManager.hide();
+        passwordController.clear();
+        showSnackBar(context, e.toString(), 4);
+      }
   }
 
   void tapOnRegisterButton() async {
-    print('move to register');
-    //Navigator.of(context).pushNamed('/Register');
-    await FlutterOverlayWindow.requestPermission();
+    log('move to register');
+    Navigator.of(context).pushNamed('/Register');
   }
 
   void tapOnForgetPasswordButton() async {
-    print('move to register');
-    //Navigator.of(context).pushNamed('/ForgetPassword');
-    if (await FlutterOverlayWindow.isActive()) return;
-    print("show popup");
-    await FlutterOverlayWindow.showOverlay(
-      enableDrag: true,
-      overlayTitle: "Thanh Tra",
-      overlayContent: 'Overlay Enabled',
-      flag: OverlayFlag.defaultFlag,
-      visibility: NotificationVisibility.visibilityPublic,
-      positionGravity: PositionGravity.auto,
-      height: (MediaQuery.of(context).size.height * 0.6).toInt(),
-      width: WindowSize.matchParent,
-      startPosition: const OverlayPosition(0, -259),
-    );
+    log('move to register');
+    Navigator.of(context).pushNamed('/ForgetPassword');
   }
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     return ScreenUtilInit(
       designSize: fullScreenPortraitSize,
       child: SafeArea(
         child: Scaffold(
           // You can design your splash screen UI here
           resizeToAvoidBottomInset: false,
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: top_margin_logo.h,
+          body: SizedBox(
+            height: screenHeight - keyboardHeight,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: top_margin_logo.h,
+                  ),
+                  const LogoAndCompanyName(),
+                  SizedBox(
+                    height: top_margin_form.h,
+                  ),
+                  CustomForm(
+                    phoneController: phoneController,
+                    passwordController: passwordController,
+                    onTapButton: tapOnLoginButton,
+                  ),
+                  RegisterAndForgetPasswordButtons(
+                    tapOnRegisterButton: tapOnRegisterButton,
+                    tapOnForgetPasswordButton: tapOnForgetPasswordButton,
+                  )
+                ],
               ),
-              const LogoAndCompanyName(),
-              SizedBox(
-                height: top_margin_form.h,
-              ),
-              CustomForm(
-                passwordController: passwordController,
-                phoneController: phoneController,
-                onTapButton: tapOnLoginButton,
-              ),
-              RegisterAndForgetPasswordButtons(
-                tapOnRegisterButton: tapOnRegisterButton,
-                tapOnForgetPasswordButton: tapOnForgetPasswordButton,
-              )
-            ],
+            ),
           ),
         ),
       ),
@@ -176,15 +193,16 @@ class LogoAndCompanyName extends StatelessWidget {
 
 // Custom form widget containing multiple CustomTextField widgets
 class CustomForm extends StatelessWidget {
-  const CustomForm(
-      {super.key,
-      required this.phoneController,
-      required this.passwordController,
-      required this.onTapButton});
+  const CustomForm({
+    super.key,
+    required this.onTapButton,
+    required this.phoneController,
+    required this.passwordController,
+  });
 
+  final VoidCallback onTapButton;
   final TextEditingController phoneController;
   final TextEditingController passwordController;
-  final VoidCallback onTapButton;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -195,17 +213,30 @@ class CustomForm extends StatelessWidget {
       child: Column(
         children: [
           CustomTextField(
+            controller: phoneController,
             icon: Icons.phone,
             hintText: text_phone,
-            controller: phoneController,
+            validator: (text) {
+              if (text == null || text.trim() == "") {
+                return "Empty phone!";
+              }
+              return null;
+            },
           ),
           SizedBox(
             height: space_between_text_field.h,
           ),
           CustomTextField(
-            icon: Icons.lock_outline,
-            hintText: text_phone,
             controller: passwordController,
+            icon: Icons.lock_outline,
+            hintText: text_password,
+            validator: (text) {
+              if (text == null || text.trim() == "") {
+                return "Empty password!";
+              }
+              return null;
+            },
+            isPassword: true,
           ),
           SizedBox(
             height: space_between_text_field.h,

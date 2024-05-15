@@ -16,15 +16,15 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: size_text_field_and_button.width.w,
-      height: size_text_field_and_button.height.h,
+      width: size_text_button.width.w,
+      height: size_text_button.height.h ,
       child: TextButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(
-              Color(0xFF266CBF),
+              const Color(0xFF266CBF),
             ), // Set the background color
             side: MaterialStateProperty.all<BorderSide>(
-              BorderSide(color: Colors.grey),
+              const BorderSide(color: Colors.grey),
             ),
             shape: MaterialStateProperty.all<OutlinedBorder>(
               RoundedRectangleBorder(
@@ -64,10 +64,13 @@ class CustomTextButton extends StatelessWidget {
           ),
         ),
       ),
-      child: Text(
-        text,
-        textAlign: textAlign,
-        style: textGray19Italic, // Set text color
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
+          textAlign: textAlign,
+          style: textGray19Italic, // Set text color
+        ),
       ),
     );
   }

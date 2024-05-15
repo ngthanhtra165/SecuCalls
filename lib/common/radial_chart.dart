@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/constant/style.dart';
-import 'package:syncfusion_flutter_charts/charts.dart' as chart;
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class RadialChart extends StatelessWidget {
@@ -9,20 +8,20 @@ class RadialChart extends StatelessWidget {
   final double value;
   final Color color;
 
-  RadialChart({required this.label, required this.value, required this.color});
+  const RadialChart({super.key, required this.label, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    final _width = MediaQuery.of(context).size.width / 2 - 40.w;
-    const _valueFontSize = 35.0;
-    const _fontFamily = 'ABeeZee';
+    final width = MediaQuery.of(context).size.width / 2 - 40.w;
+    const valueFontSize = 35.0;
+    const fontFamily = 'ABeeZee';
     return Column(
       children: [
         SizedBox(
           height: 20.h,
         ),
         SizedBox(
-          width: _width,
+          width: width,
           height: 55.h,
           child: FittedBox(
             fit: BoxFit.scaleDown,
@@ -35,7 +34,7 @@ class RadialChart extends StatelessWidget {
         ),
         Expanded(
           child: SizedBox(
-            width: _width,
+            width: width,
             child: SfRadialGauge(
               axes: <RadialAxis>[
                 RadialAxis(
@@ -55,16 +54,16 @@ class RadialChart extends StatelessWidget {
                               Text(
                                 value.toInt().toString(),
                                 style: const TextStyle(
-                                    fontFamily: _fontFamily,
-                                    fontSize: _valueFontSize,
+                                    fontFamily: fontFamily,
+                                    fontSize: valueFontSize,
                                     fontWeight: FontWeight.w400,
                                     fontStyle: FontStyle.italic),
                               ),
                               const Text(
                                 '%',
                                 style: TextStyle(
-                                    fontFamily: _fontFamily,
-                                    fontSize: _valueFontSize,
+                                    fontFamily: fontFamily,
+                                    fontSize: valueFontSize,
                                     fontWeight: FontWeight.w400,
                                     fontStyle: FontStyle.italic),
                               ),

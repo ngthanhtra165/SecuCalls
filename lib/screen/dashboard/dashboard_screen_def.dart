@@ -32,5 +32,6 @@ const Size size_logo = Size(105, 105);
 const Size size_icon = Size(49, 49);
 // Drawer
 const String title_drawer_item_1 = "Trang chủ";
-const String title_drawer_item_2 = "Quên mật khẩu";
+const String title_drawer_item_2 = "Đổi mật khẩu";
 const String title_drawer_item_3 = "Đăng xuất";
+const String title_drawer_item_4 = "Lịch sử cuộc gọi";

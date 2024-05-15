@@ -1,14 +1,14 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers
+// ignore_for_file: no_leading_underscores_for_local_identifiers, use_build_context_synchronously
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:secucalls/common/appbar.dart';
-import 'package:secucalls/common/button.dart';
+import 'package:secucalls/common/drawer.dart';
 import 'package:secucalls/common/radial_chart.dart';
-import 'package:secucalls/common/text_field.dart';
 import 'package:secucalls/constant/design_size.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/dashboard/dashboard_screen_def.dart';
+import 'package:secucalls/utils/drawer.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -20,6 +20,8 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen>
     with TickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  
   @override
   void initState() {
     super.initState();
@@ -27,22 +29,20 @@ class _DashboardScreenState extends State<DashboardScreen>
     _tabController = TabController(length: 3, vsync: this);
   }
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  void tapOnForgetPasswordButton() {
-    print('move to forget password');
-    Navigator.of(context).pushNamed('/ForgetPassword');
-    _scaffoldKey.currentState?.openEndDrawer();
+  void tapOnChangePasswordButton() {
+    DrawerUtils.tapOnChangePasswordButton(context, _scaffoldKey);
   }
 
-  void tapOnLogOutButton() {
-    print('move to log out');
-    Navigator.pushNamedAndRemoveUntil(context, '/Login', (route) => false);
+  void tapOnLogOutButton() async {
+    DrawerUtils.tapOnLogOutButton(context);
   }
 
   void tapOnHomeButton() {
-    print('home');
-    _scaffoldKey.currentState?.openEndDrawer();
+    DrawerUtils.tapOnSameButton(_scaffoldKey);
+  }
+
+  void tapOnCallLogButton() {
+    DrawerUtils.tapOnCallLogButton(context, _scaffoldKey);
   }
 
   late String number;
@@ -56,9 +56,10 @@ class _DashboardScreenState extends State<DashboardScreen>
         child: Scaffold(
           key: _scaffoldKey,
           drawer: CustomDrawer(
-            tapOnForgetPasswordButton: tapOnForgetPasswordButton,
+            tapOnChangePasswordButton: tapOnChangePasswordButton,
             tapOnHomeButton: tapOnHomeButton,
             tapOnLogOutButton: tapOnLogOutButton,
+            tapOnCallLogButton: tapOnCallLogButton,
           ),
           // You can design your splash screen UI here
           resizeToAvoidBottomInset: false,
@@ -87,121 +88,6 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
         ),
       ),
-    );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _tabController.dispose();
-  }
-}
-
-class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({
-    super.key,
-    required this.tapOnForgetPasswordButton,
-    required this.tapOnHomeButton,
-    required this.tapOnLogOutButton,
-  });
-  final VoidCallback tapOnForgetPasswordButton;
-  final VoidCallback tapOnHomeButton;
-  final VoidCallback tapOnLogOutButton;
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      backgroundColor: Colors.white,
-      child: ListView(
-        children: [
-          SizedBox(
-            height: height_drawer_header.h,
-            width: double.infinity,
-            child: DrawerHeader(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    alignment: Alignment.bottomCenter,
-                    "lib/assets/logo.png",
-                    width: size_logo.width.w,
-                    height: size_logo.height.h,
-                  ),
-                  const FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      title_appbar,
-                      style: textBlack28Italic,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-            height: top_margin_drawer_item.h,
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-              left: left_margin_drawer_item.w,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                CustomListTile(
-                  title: title_drawer_item_1,
-                  icon: Icons.home,
-                  onPress: tapOnHomeButton,
-                ),
-                SizedBox(
-                  height: 15.h,
-                ),
-                CustomListTile(
-                  title: title_drawer_item_2,
-                  icon: Icons.account_box,
-                  onPress: tapOnForgetPasswordButton,
-                ),
-                SizedBox(
-                  height: 15.h,
-                ),
-                CustomListTile(
-                  title: title_drawer_item_3,
-                  icon: Icons.logout_outlined,
-                  onPress: tapOnLogOutButton,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class CustomListTile extends StatelessWidget {
-  const CustomListTile({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.onPress,
-  });
-  final String title;
-  final IconData icon;
-  final VoidCallback onPress;
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(
-        icon,
-        size: size_icon.height.h,
-        color: Colors.black,
-      ),
-      title: Text(
-        title,
-        style: textBlack19,
-      ),
-      onTap: onPress,
     );
   }
 }
@@ -367,14 +253,14 @@ class DashboardPanel extends StatelessWidget {
     final double _cheatNumber = percentageList[1];
     final double _adsNumber = percentageList[2];
     final double _totalNumber = percentageList[3];
-    final double height_row = height_tab_bar_view.h / 2;
+    final double heightRow = height_tab_bar_view.h / 2;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.h),
       width: double.infinity,
       child: Column(
         children: [
           SizedBox(
-            height: height_row,
+            height: heightRow,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -392,7 +278,7 @@ class DashboardPanel extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: height_row,
+            height: heightRow,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
