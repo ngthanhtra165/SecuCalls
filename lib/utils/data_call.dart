@@ -41,7 +41,7 @@ Future<void> fetchDataFromServer(BuildContext context) async {
     if (!Hive.isBoxOpen("data_from_server")) {
       await Hive.openBox("data_from_server");
     }
-
+  
     final Box box = Hive.box("data_from_server");
     await box.clear();
     print("clear box");

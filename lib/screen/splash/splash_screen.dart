@@ -8,6 +8,9 @@ import 'package:secucalls/constant/constants.dart';
 import 'package:secucalls/constant/style.dart';
 import 'package:secucalls/screen/login/login_screen.dart';
 import 'package:secucalls/screen/splash/splash_screen_def.dart';
+import 'package:secucalls/service/hive.dart';
+import 'package:secucalls/utils/data_call.dart';
+import 'package:secucalls/utils/overlay_manager.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,10 +23,22 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(
+    checkLoginState(); 
+  }
+
+  Future<void> checkLoginState() async {
+    final refreshToken = await getString("token", "refresh_token");
+    if (refreshToken != null) {
+      OverlayIndicatorManager.show(context);
+      await fetchDataFromServer(context);
+      Navigator.of(context).pushNamed("/Dashboard");
+      OverlayIndicatorManager.hide();
+    } else {
+      Timer(
         const Duration(seconds: 3),
         () => Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (BuildContext context) => const LoginScreen())));
+    }
   }
 
   @override

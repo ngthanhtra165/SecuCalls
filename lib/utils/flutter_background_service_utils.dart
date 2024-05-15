@@ -109,7 +109,7 @@ void onStart(ServiceInstance service) async {
   var state = false;
   var showPopup = false;
   Timer.periodic(const Duration(seconds: 1), (timer) async {
-    print("state is $state and $showPopup");
+    //print("state is $state and $showPopup");
     if (state == true && showPopup == false) {
       showPopup = true;
       if (await FlutterOverlayWindow.isActive()) return;

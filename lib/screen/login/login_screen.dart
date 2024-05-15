@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:secucalls/common/button.dart';
 import 'package:secucalls/common/text_field.dart';
@@ -30,7 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  //static const platform = MethodChannel('samples.flutter.dev/battery');
   @override
   void initState() {
     super.initState();
@@ -45,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final pass = passwordController.text;
     log('Name: $phone, Email: $pass');
     OverlayIndicatorManager.show(context);
-    await Future.delayed(const Duration(seconds: 1), () async {
       try {
         final response = await APIService.shared.loginUser(phone, pass);
         await addStringIntoBox("token", {
@@ -60,19 +57,11 @@ class _LoginScreenState extends State<LoginScreen> {
         passwordController.clear();
         showSnackBar(context, e.toString(), 4);
       }
-    });
   }
 
   void tapOnRegisterButton() async {
     log('move to register');
-    print("show pop up incoming");
-    await FlutterOverlayWindow.showOverlay(
-      enableDrag: true,
-      overlayTitle: "X-SLAYER",
-      overlayContent: 'Overlay Enabled',
-      flag: OverlayFlag.defaultFlag,
-    );
-    // Navigator.of(context).pushNamed('/Register');
+    Navigator.of(context).pushNamed('/Register');
   }
 
   void tapOnForgetPasswordButton() async {

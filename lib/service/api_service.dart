@@ -20,8 +20,8 @@ class APIService {
       },
       body: jsonEncode(
         {
-          'phone': "0345827894",
-          'password': "Tra1@gmail",
+          'phone': phone,
+          'password': password,
         },
       ),
     );
